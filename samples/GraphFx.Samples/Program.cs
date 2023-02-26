@@ -15,11 +15,12 @@ var graph2 = DirectedGraph
     .AddEdge("A", "B")
     .AddEdge("B", "C")
     .AddEdge("C", "A")
+    .AddNodes("C", "D", "E", "F")
     .Build();
 
 Console.WriteLine(graph2.ToEnglishCompact());
 
 var assemblies = ReflectionGraphs
-    .AssemblyDependencyGraph(@"(^System\.)|(^netstandard$)")
+    .AssemblyDependencyGraph(@"(^System\.(Console|Text|Runtime|Private))|(^netstandard$)")
     .ToDirectedGraph();
 Console.WriteLine(assemblies.ToEnglishReadable());

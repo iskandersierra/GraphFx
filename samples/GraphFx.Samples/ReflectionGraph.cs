@@ -8,30 +8,16 @@ public static class ReflectionGraphs
 {
     public static ISeededDirectedGraphSource<Assembly> AssemblyDependencyGraph(string? excludePattern = null)
     {
-        var excludedRegex = excludePattern is null ? null : 
-                new Regex(excludePattern);
+        var regex = excludePattern is null ? null : new Regex(excludePattern);
 
-        string GetName(AssemblyName assemblyName) => assemblyName.Name ?? "UNKNOWN";
+        static string GetName(AssemblyName assemblyName) => assemblyName.Name ?? "UNKNOWN";
+        static string GetAssemblyName(Assembly assembly) => GetName(assembly.GetName());
 
-        bool IsIncluded(AssemblyName assemblyName)
-        {
-            return excludedRegex?.IsMatch(GetName(assemblyName)) != true;
-        }
-
-        IEnumerable<Assembly> Seeds()
-        {
-            yield return typeof(ReflectionGraphs).Assembly;
-        }
-
-        IEnumerable<Assembly> GetDependencies(Assembly current)
-        {
-            return current.GetReferencedAssemblies()
-                .Where(IsIncluded)
-                .Select(Assembly.Load);
-        }
-
-        return SeededDirectedGraphSource
-            .Create(Seeds(), GetDependencies)
-            .WithFormatter(GraphFormatter.Create<Assembly>(assembly => GetName(assembly.GetName())));
+        return SeededDirectedGraphSource.Create(
+            typeof(ReflectionGraphs).Assembly,
+            asm => asm.GetReferencedAssemblies()
+                .Where(name => regex?.IsMatch(GetName(name)) != true)
+                .Select(Assembly.Load),
+            GetAssemblyName);
     }
 }

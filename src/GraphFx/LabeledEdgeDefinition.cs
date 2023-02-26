@@ -9,9 +9,9 @@ public readonly struct LabeledEdgeDefinition<TNode, TEdge>
 {
     public LabeledEdgeDefinition(TNode source, TEdge edge, TNode target)
     {
-        Source = source;
-        Edge = edge;
-        Target = target;
+        Source = source ?? throw new ArgumentNullException(nameof(source));
+        Edge = edge ?? throw new ArgumentNullException(nameof(edge));
+        Target = target ?? throw new ArgumentNullException(nameof(target));
     }
 
     public readonly TNode Source;
@@ -37,8 +37,8 @@ public readonly struct EdgeDefinition<TNode>
 {
     public EdgeDefinition(TNode source, TNode target)
     {
-        Source = source;
-        Target = target;
+        Source = source ?? throw new ArgumentNullException(nameof(source));
+        Target = target ?? throw new ArgumentNullException(nameof(target));
     }
 
     public readonly TNode Source;

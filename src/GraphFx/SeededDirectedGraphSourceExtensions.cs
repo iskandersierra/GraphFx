@@ -1,4 +1,6 @@
-﻿namespace GraphFx;
+﻿using System.Reflection;
+
+namespace GraphFx;
 
 public static class SeededDirectedGraphSourceExtensions
 {
@@ -65,6 +67,7 @@ public static class SeededDirectedGraphSourceExtensions
                 {
                     queue.Enqueue(targetNode);
                 }
+
                 yield return EdgeDefinition.Create(node, edge, targetNode);
             }
         }
@@ -151,6 +154,7 @@ public static class SeededDirectedGraphSourceExtensions
                 {
                     queue.Enqueue(targetNode);
                 }
+
                 yield return EdgeDefinition.Create(node, targetNode);
             }
         }
@@ -254,99 +258,65 @@ public static class SeededDirectedGraphSourceExtensions
             source.NodeComparer,
             formatter);
     }
-}
 
-public static class SeededDirectedGraphSource
-{
-    public static ISeededDirectedGraphSource<TNode, TEdge> Create<TNode, TEdge>(
-        IEnumerable<TNode> nodes,
-        Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges,
+    public static ISeededDirectedGraphSource<TNode, TEdge> ToSeededDirectedGraph<TNode, TEdge>(
+        this IDictionary<TNode, ICollection<(TEdge Edge, TNode Node)>> adjacencyGraph,
         IEqualityComparer<TNode>? nodeComparer = null,
         IGraphFormatter<TNode, TEdge>? formatter = null)
         where TNode : notnull
         where TEdge : notnull
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-        if (getEdges == null) throw new ArgumentNullException(nameof(getEdges));
-        nodeComparer ??= EqualityComparer<TNode>.Default;
-        formatter ??= GraphFormatter<TNode, TEdge>.Default;
+        if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
-        return new CustomSeededDirectedGraphSource<TNode, TEdge>(nodes, getEdges, nodeComparer, formatter);
+        return SeededDirectedGraphSource.Create(
+            adjacencyGraph.Keys,
+            node => adjacencyGraph.TryGetValue(node, out var edges) ? edges : Enumerable.Empty<(TEdge, TNode)>(),
+            nodeComparer,
+            formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> Create<TNode>(
-        IEnumerable<TNode> nodes,
-        Func<TNode, IEnumerable<TNode>> getEdges,
+    public static ISeededDirectedGraphSource<TNode, TEdge> ToSeededDirectedGraph<TNode, TEdge>(
+        this IEnumerable<(TNode Source, IEnumerable<(TEdge Edge, TNode Target)> Edges)> adjacencyGraph,
+        IEqualityComparer<TNode>? nodeComparer = null,
+        IGraphFormatter<TNode, TEdge>? formatter = null)
+        where TNode : notnull
+        where TEdge : notnull
+    {
+        if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
+
+        return adjacencyGraph
+            .ToDictionary(
+                t => t.Source,
+                t => t.Edges.Select(e => (e.Edge, e.Target)).ToArray() as ICollection<(TEdge, TNode)>,
+                nodeComparer)
+            .ToSeededDirectedGraph(nodeComparer, formatter);
+    }
+
+    public static ISeededDirectedGraphSource<TNode> ToSeededDirectedGraph<TNode>(
+        this IDictionary<TNode, ICollection<TNode>> adjacencyGraph,
         IEqualityComparer<TNode>? nodeComparer = null,
         IGraphFormatter<TNode>? formatter = null)
         where TNode : notnull
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-        if (getEdges == null) throw new ArgumentNullException(nameof(getEdges));
-        nodeComparer ??= EqualityComparer<TNode>.Default;
-        formatter ??= GraphFormatter<TNode>.Default;
+        if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
-        return new CustomSeededDirectedGraphSource<TNode>(nodes, getEdges, nodeComparer, formatter);
+        return SeededDirectedGraphSource.Create(
+            adjacencyGraph.Keys,
+            node => adjacencyGraph.TryGetValue(node, out var edges) ? edges : Enumerable.Empty<TNode>(),
+            nodeComparer,
+            formatter);
     }
 
-    private class CustomSeededDirectedGraphSource<TNode, TEdge> :
-        ISeededDirectedGraphSource<TNode, TEdge>
-        where TNode : notnull
-        where TEdge : notnull
-    {
-        private readonly Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges;
-
-        public CustomSeededDirectedGraphSource(
-            IEnumerable<TNode> nodes,
-            Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode, TEdge> formatter)
-        {
-            SeedNodes = nodes;
-            this.getEdges = getEdges;
-            NodeComparer = nodeComparer;
-            Formatter = formatter;
-        }
-
-        public IEnumerable<TNode> SeedNodes { get; }
-
-        public IEqualityComparer<TNode> NodeComparer { get; }
-
-        public IGraphFormatter<TNode, TEdge> Formatter { get; }
-
-        public IEnumerable<(TEdge, TNode)> GetEdges(TNode node)
-        {
-            return getEdges(node);
-        }
-    }
-
-    private class CustomSeededDirectedGraphSource<TNode> :
-        ISeededDirectedGraphSource<TNode>
+    public static ISeededDirectedGraphSource<TNode> ToSeededDirectedGraph<TNode>(
+        this IEnumerable<(TNode Node, IEnumerable<TNode> Edges)> adjacencyGraph,
+        IEqualityComparer<TNode>? nodeComparer = null,
+        IGraphFormatter<TNode>? formatter = null)
         where TNode : notnull
     {
-        private readonly Func<TNode, IEnumerable<TNode>> getEdges;
+        if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
-        public CustomSeededDirectedGraphSource(
-            IEnumerable<TNode> nodes,
-            Func<TNode, IEnumerable<TNode>> getEdges,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode> formatter)
-        {
-            SeedNodes = nodes;
-            this.getEdges = getEdges;
-            NodeComparer = nodeComparer;
-            Formatter = formatter;
-        }
-
-        public IEnumerable<TNode> SeedNodes { get; }
-
-        public IEqualityComparer<TNode> NodeComparer { get; }
-
-        public IGraphFormatter<TNode> Formatter { get; }
-
-        public IEnumerable<TNode> GetEdges(TNode node)
-        {
-            return getEdges(node);
-        }
+        return adjacencyGraph
+            .ToDictionary(x => x.Node, x => x.Edges.ToArray() as ICollection<TNode>, nodeComparer)
+            .ToSeededDirectedGraph(nodeComparer, formatter);
     }
 }

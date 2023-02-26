@@ -25,8 +25,24 @@ public static class DirectedGraph
 
         public GraphBuilder<TNode, TEdge> AddNode(TNode node)
         {
+            if (node == null) throw new ArgumentNullException(nameof(node));
             nodes.Add(node);
             return this;
+        }
+
+        public GraphBuilder<TNode, TEdge> AddNodes(IEnumerable<TNode> nodes)
+        {
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            foreach (var node in nodes)
+            {
+                this.nodes.Add(node ?? throw new ArgumentNullException(nameof(node)));
+            }
+            return this;
+        }
+
+        public GraphBuilder<TNode, TEdge> AddNodes(params TNode[] nodes)
+        {
+            return AddNodes((IEnumerable<TNode>)nodes);
         }
 
         public GraphBuilder<TNode, TEdge> AddEdge(LabeledEdgeDefinition<TNode, TEdge> labeledEdge)
@@ -38,6 +54,18 @@ public static class DirectedGraph
         public GraphBuilder<TNode, TEdge> AddEdge(TNode source, TEdge edge, TNode target)
         {
             return this.AddEdge(EdgeDefinition.Create(source, edge, target));
+        }
+
+        public GraphBuilder<TNode, TEdge> AddEdges(IEnumerable<LabeledEdgeDefinition<TNode, TEdge>> edges)
+        {
+            if (edges == null) throw new ArgumentNullException(nameof(edges));
+            this.edges.AddRange(edges);
+            return this;
+        }
+
+        public GraphBuilder<TNode, TEdge> AddEdges(params LabeledEdgeDefinition<TNode, TEdge>[] edges)
+        {
+            return AddEdges((IEnumerable<LabeledEdgeDefinition<TNode, TEdge>>)edges);
         }
 
         public GraphBuilder<TNode, TEdge> WithNodeComparer(IEqualityComparer<TNode> comparer)
@@ -169,8 +197,24 @@ public static class DirectedGraph
 
         public GraphBuilder<TNode> AddNode(TNode node)
         {
+            if (node == null) throw new ArgumentNullException(nameof(node));
             nodes.Add(node);
             return this;
+        }
+
+        public GraphBuilder<TNode> AddNodes(IEnumerable<TNode> nodes)
+        {
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            foreach (var node in nodes)
+            {
+                this.AddNode(node ?? throw new ArgumentNullException(nameof(node)));
+            }
+            return this;
+        }
+
+        public GraphBuilder<TNode> AddNodes(params TNode[] nodes)
+        {
+            return this.AddNodes((IEnumerable<TNode>)nodes);
         }
 
         public GraphBuilder<TNode> AddEdge(EdgeDefinition<TNode> edge)
@@ -182,6 +226,20 @@ public static class DirectedGraph
         public GraphBuilder<TNode> AddEdge(TNode source, TNode target)
         {
             return this.AddEdge(EdgeDefinition.Create(source, target));
+        }
+
+        public GraphBuilder<TNode> AddEdges(IEnumerable<EdgeDefinition<TNode>> edges)
+        {
+            foreach (var edge in edges)
+            {
+                this.AddEdge(edge);
+            }
+            return this;
+        }
+
+        public GraphBuilder<TNode> AddEdges(params EdgeDefinition<TNode>[] edges)
+        {
+            return this.AddEdges((IEnumerable<EdgeDefinition<TNode>>)edges);
         }
 
         public GraphBuilder<TNode> WithNodeComparer(IEqualityComparer<TNode> comparer)
