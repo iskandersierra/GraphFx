@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{253BCDC4-22B0-4FD7-8462-D04BEDA8B1A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{36F51920-B58E-4F85-9995-7F4FD81B945D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{879C2C67-43E0-4A17-B05E-631600F7172B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphFx", "src\GraphFx\GraphFx.csproj", "{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphFx.Samples", "samples\GraphFx.Samples\GraphFx.Samples.csproj", "{A075B0E0-143D-4D65-8351-43B56AECFE9A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A075B0E0-143D-4D65-8351-43B56AECFE9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A075B0E0-143D-4D65-8351-43B56AECFE9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A075B0E0-143D-4D65-8351-43B56AECFE9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A075B0E0-143D-4D65-8351-43B56AECFE9A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE4BCBE0-B0F0-48D3-8A17-F30CB1E555D7} = {253BCDC4-22B0-4FD7-8462-D04BEDA8B1A0}
+		{A075B0E0-143D-4D65-8351-43B56AECFE9A} = {879C2C67-43E0-4A17-B05E-631600F7172B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C333F022-518F-4CB1-BA11-E9D168EB645E}
+	EndGlobalSection
+EndGlobal
