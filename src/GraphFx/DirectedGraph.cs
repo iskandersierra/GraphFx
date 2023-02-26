@@ -14,7 +14,7 @@ public static class DirectedGraph
         where TEdge : notnull
     {
         private readonly List<TNode> nodes = new();
-        private readonly List<EdgeDefinition<TNode, TEdge>> edges = new();
+        private readonly List<LabeledEdgeDefinition<TNode, TEdge>> edges = new();
         private IEqualityComparer<TNode>? nodeComparer;
         private IGraphFormatter<TNode, TEdge>? formatter;
 
@@ -29,9 +29,9 @@ public static class DirectedGraph
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> AddEdge(EdgeDefinition<TNode, TEdge> edge)
+        public GraphBuilder<TNode, TEdge> AddEdge(LabeledEdgeDefinition<TNode, TEdge> labeledEdge)
         {
-            edges.Add(edge);
+            edges.Add(labeledEdge);
             return this;
         }
 
@@ -99,7 +99,7 @@ public static class DirectedGraph
             var nodeComp = nodeComparer ?? EqualityComparer<TNode>.Default;
             var fmt = formatter ?? GraphFormatter<TNode, TEdge>.Default;
 
-            var edgeList = new List<EdgeDefinition<TNode, TEdge>>();
+            var edgeList = new List<LabeledEdgeDefinition<TNode, TEdge>>();
             var nodeSet = new HashSet<TNode>(nodeComp);
 
             var nodeList = nodes.Where(nodeSet.Add).ToList();
@@ -130,7 +130,7 @@ public static class DirectedGraph
     {
         internal BuiltGraph(
             IReadOnlyList<TNode> nodesCollection,
-            IReadOnlyList<EdgeDefinition<TNode, TEdge>> edgesCollection,
+            IReadOnlyList<LabeledEdgeDefinition<TNode, TEdge>> edgesCollection,
             IEqualityComparer<TNode> nodeComparer,
             IGraphFormatter<TNode, TEdge> formatter)
         {
@@ -142,7 +142,7 @@ public static class DirectedGraph
 
         public IReadOnlyList<TNode> Nodes { get; }
 
-        public IReadOnlyList<EdgeDefinition<TNode, TEdge>> Edges { get; }
+        public IReadOnlyList<LabeledEdgeDefinition<TNode, TEdge>> Edges { get; }
 
         public IEqualityComparer<TNode> NodeComparer { get; }
 

@@ -3,11 +3,11 @@
 namespace GraphFx;
 
 [DebuggerDisplay("{ToDebugString()}")]
-public readonly struct EdgeDefinition<TNode, TEdge>
+public readonly struct LabeledEdgeDefinition<TNode, TEdge>
     where TNode : notnull
     where TEdge : notnull
 {
-    public EdgeDefinition(TNode source, TEdge edge, TNode target)
+    public LabeledEdgeDefinition(TNode source, TEdge edge, TNode target)
     {
         Source = source;
         Edge = edge;
@@ -58,11 +58,11 @@ public readonly struct EdgeDefinition<TNode>
 
 public static class EdgeDefinition
 {
-    public static EdgeDefinition<TNode, TEdge> Create<TNode, TEdge>(TNode source, TEdge edge, TNode target)
+    public static LabeledEdgeDefinition<TNode, TEdge> Create<TNode, TEdge>(TNode source, TEdge edge, TNode target)
         where TNode : notnull
         where TEdge : notnull
     {
-        return new EdgeDefinition<TNode, TEdge>(source, edge, target);
+        return new LabeledEdgeDefinition<TNode, TEdge>(source, edge, target);
     }
 
     public static EdgeDefinition<TNode> Create<TNode>(TNode source, TNode target)

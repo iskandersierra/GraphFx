@@ -6,7 +6,7 @@ public interface IDirectedGraphSource<TNode, TEdge>
 {
     IEnumerable<TNode> Nodes { get; }
 
-    IEnumerable<EdgeDefinition<TNode, TEdge>> Edges { get; }
+    IEnumerable<LabeledEdgeDefinition<TNode, TEdge>> Edges { get; }
 
     IEqualityComparer<TNode> NodeComparer { get; }
 

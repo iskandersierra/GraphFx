@@ -6,7 +6,7 @@ public interface IDirectedGraph<TNode, TEdge>
 {
     IReadOnlyList<TNode> Nodes { get; }
 
-    IReadOnlyList<EdgeDefinition<TNode, TEdge>> Edges { get; }
+    IReadOnlyList<LabeledEdgeDefinition<TNode, TEdge>> Edges { get; }
 
     IEqualityComparer<TNode> NodeComparer { get; }
 
