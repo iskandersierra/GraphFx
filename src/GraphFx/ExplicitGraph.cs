@@ -256,3 +256,166 @@ public static class ExplicitGraph
         }
     }
 }
+
+public class ExplicitGraph<TVertex> :
+    IExplicitGraph<TVertex>
+    where TVertex : notnull
+{
+    private readonly HashSet<TVertex> vertices;
+    private readonly List<Edge<TVertex>> edges;
+
+    public ExplicitGraph(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null)
+    {
+        VertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+        VertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+        VertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+        vertices = new HashSet<TVertex>(VertexEqualityComparer);
+        edges = new List<Edge<TVertex>>();
+    }
+
+    public IEnumerable<TVertex> Vertices => vertices;
+
+    public IEnumerable<Edge<TVertex>> Edges => edges;
+
+    public IEqualityComparer<TVertex> VertexEqualityComparer { get; }
+
+    public IComparer<TVertex> VertexComparer { get; }
+
+    public IStringFormatter<TVertex> VertexFormatter { get; }
+
+    public void Add(TVertex vertex)
+    {
+        if (vertex == null) throw new ArgumentNullException(nameof(vertex));
+
+        vertices.Add(vertex);
+    }
+
+    public void Add(Edge<TVertex> edge)
+    {
+        vertices.Add(edge.Source);
+        vertices.Add(edge.Target);
+        edges.Add(edge);
+    }
+
+    public void AddRange(IEnumerable<TVertex> vertices)
+    {
+        if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+
+        foreach (var vertex in vertices)
+        {
+            Add(vertex);
+        }
+    }
+
+    public void AddRange(IEnumerable<Edge<TVertex>> edges)
+    {
+        if (edges == null) throw new ArgumentNullException(nameof(edges));
+
+        foreach (var edge in edges)
+        {
+            Add(edge);
+        }
+    }
+
+    public void AddRange(params TVertex[] vertices)
+    {
+        if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+
+        AddRange((IEnumerable<TVertex>)vertices);
+    }
+
+    public void AddRange(params Edge<TVertex>[] edges)
+    {
+        if (edges == null) throw new ArgumentNullException(nameof(edges));
+
+        AddRange((IEnumerable<Edge<TVertex>>)edges);
+    }
+}
+
+public class ExplicitGraph<TVertex, TEdgeLabel> :
+    IExplicitGraph<TVertex, TEdgeLabel>
+    where TVertex : notnull
+    where TEdgeLabel : notnull
+{
+    private readonly HashSet<TVertex> vertices;
+    private readonly List<Edge<TVertex, TEdgeLabel>> edges;
+
+    public ExplicitGraph(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null,
+        IStringFormatter<TEdgeLabel>? edgeLabelFormatter = null)
+    {
+        VertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+        VertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+        VertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+        EdgeLabelFormatter = edgeLabelFormatter ?? StringFormatter<TEdgeLabel>.Default;
+        vertices = new HashSet<TVertex>(VertexEqualityComparer);
+        edges = new List<Edge<TVertex, TEdgeLabel>>();
+    }
+
+    public IEnumerable<TVertex> Vertices => vertices;
+
+    public IEnumerable<Edge<TVertex, TEdgeLabel>> LabeledEdges => edges;
+
+    public IEnumerable<Edge<TVertex>> Edges => edges.Select(edge => edge.ToUnlabeledEdge());
+
+    public IEqualityComparer<TVertex> VertexEqualityComparer { get; }
+
+    public IComparer<TVertex> VertexComparer { get; }
+
+    public IStringFormatter<TVertex> VertexFormatter { get; }
+
+    public IStringFormatter<TEdgeLabel> EdgeLabelFormatter { get; }
+
+    public void Add(TVertex vertex)
+    {
+        if (vertex == null) throw new ArgumentNullException(nameof(vertex));
+
+        vertices.Add(vertex);
+    }
+
+    public void Add(Edge<TVertex, TEdgeLabel> edge)
+    {
+        vertices.Add(edge.Source);
+        vertices.Add(edge.Target);
+        edges.Add(edge);
+    }
+
+    public void AddRange(IEnumerable<TVertex> vertices)
+    {
+        if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+
+        foreach (var vertex in vertices)
+        {
+            Add(vertex);
+        }
+    }
+
+    public void AddRange(IEnumerable<Edge<TVertex, TEdgeLabel>> edges)
+    {
+        if (edges == null) throw new ArgumentNullException(nameof(edges));
+
+        foreach (var edge in edges)
+        {
+            Add(edge);
+        }
+    }
+
+    public void AddRange(params TVertex[] vertices)
+    {
+        if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+
+        AddRange((IEnumerable<TVertex>)vertices);
+    }
+
+    public void AddRange(params Edge<TVertex, TEdgeLabel>[] edges)
+    {
+        if (edges == null) throw new ArgumentNullException(nameof(edges));
+
+        AddRange((IEnumerable<Edge<TVertex, TEdgeLabel>>)edges);
+    }
+}
