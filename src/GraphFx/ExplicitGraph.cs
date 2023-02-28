@@ -1,40 +1,40 @@
 ﻿namespace GraphFx;
 
-public static class EnumerableGraph
+public static class ExplicitGraph
 {
-    public static EnumerableGraphBuilder<TVertex> Create<TVertex>(
-        IEnumerableGraph<TVertex> fromDefinition)
+    public static ExplicitGraphBuilder<TVertex> Create<TVertex>(
+        IExplicitGraph<TVertex> fromDefinition)
         where TVertex : notnull
     {
-        return new EnumerableGraphBuilder<TVertex>(fromDefinition);
+        return new ExplicitGraphBuilder<TVertex>(fromDefinition);
     }
 
-    public static EnumerableGraphBuilder<TVertex> Create<TVertex>()
+    public static ExplicitGraphBuilder<TVertex> Create<TVertex>()
         where TVertex : notnull
     {
-        return new EnumerableGraphBuilder<TVertex>();
+        return new ExplicitGraphBuilder<TVertex>();
     }
 
-    public static EnumerableGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
-        IEnumerableGraph<TVertex, TEdgeLabel> fromDefinition)
+    public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IExplicitGraph<TVertex, TEdgeLabel> fromDefinition)
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        return new EnumerableGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
+        return new ExplicitGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
-    public static EnumerableGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>()
+    public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>()
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        return new EnumerableGraphBuilder<TVertex, TEdgeLabel>();
+        return new ExplicitGraphBuilder<TVertex, TEdgeLabel>();
     }
 
-    private class BuiltEnumerableGraph<TVertex> :
-        IEnumerableGraph<TVertex>
+    private class BuiltExplicitGraph<TVertex> :
+        IExplicitGraph<TVertex>
         where TVertex : notnull
     {
-        internal BuiltEnumerableGraph(
+        internal BuiltExplicitGraph(
             IEqualityComparer<TVertex> vertexEqualityComparer,
             IComparer<TVertex> vertexComparer,
             IStringFormatter<TVertex> vertexFormatter,
@@ -59,7 +59,7 @@ public static class EnumerableGraph
         public IStringFormatter<TVertex> VertexFormatter { get; }
     }
 
-    public class EnumerableGraphBuilder<TVertex>
+    public class ExplicitGraphBuilder<TVertex>
         where TVertex : notnull
     {
         private IEqualityComparer<TVertex> vertexEqualityComparer;
@@ -68,14 +68,14 @@ public static class EnumerableGraph
         private IEnumerable<TVertex>? vertices;
         private IEnumerable<Edge<TVertex>>? edges;
 
-        internal EnumerableGraphBuilder()
+        internal ExplicitGraphBuilder()
         {
             vertexEqualityComparer = EqualityComparer<TVertex>.Default;
             vertexComparer = Comparer<TVertex>.Default;
             vertexFormatter = StringFormatter<TVertex>.Default;
         }
 
-        internal EnumerableGraphBuilder(IEnumerableGraph<TVertex> fromDefinition)
+        internal ExplicitGraphBuilder(IExplicitGraph<TVertex> fromDefinition)
         {
             if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
 
@@ -86,45 +86,45 @@ public static class EnumerableGraph
             edges = fromDefinition.Edges;
         }
 
-        public EnumerableGraphBuilder<TVertex> WithVertexEqualityComparer(
+        public ExplicitGraphBuilder<TVertex> WithVertexEqualityComparer(
             IEqualityComparer<TVertex> comparer)
         {
             this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex> WithVertexComparer(
+        public ExplicitGraphBuilder<TVertex> WithVertexComparer(
             IComparer<TVertex> comparer)
         {
             this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex> WithVertexFormatter(
+        public ExplicitGraphBuilder<TVertex> WithVertexFormatter(
             IStringFormatter<TVertex> formatter)
         {
             this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex> WithVertices(IEnumerable<TVertex> vertices)
+        public ExplicitGraphBuilder<TVertex> WithVertices(IEnumerable<TVertex> vertices)
         {
             this.vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex> WithEdges(IEnumerable<Edge<TVertex>> edges)
+        public ExplicitGraphBuilder<TVertex> WithEdges(IEnumerable<Edge<TVertex>> edges)
         {
             this.edges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 
-        public IEnumerableGraph<TVertex> Build()
+        public IExplicitGraph<TVertex> Build()
         {
             if (vertices == null) throw new ArgumentNullException(nameof(vertices));
             if (edges == null) throw new ArgumentNullException(nameof(edges));
 
-            return new BuiltEnumerableGraph<TVertex>(
+            return new BuiltExplicitGraph<TVertex>(
                 vertexEqualityComparer,
                 vertexComparer,
                 vertexFormatter,
@@ -133,12 +133,12 @@ public static class EnumerableGraph
         }
     }
 
-    private class BuiltEnumerableGraph<TVertex, TEdgeLabel> :
-        IEnumerableGraph<TVertex, TEdgeLabel>
+    private class BuiltExplicitGraph<TVertex, TEdgeLabel> :
+        IExplicitGraph<TVertex, TEdgeLabel>
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        internal BuiltEnumerableGraph(
+        internal BuiltExplicitGraph(
             IEqualityComparer<TVertex> vertexEqualityComparer,
             IComparer<TVertex> vertexComparer,
             IStringFormatter<TVertex> vertexFormatter,
@@ -169,7 +169,7 @@ public static class EnumerableGraph
         public IStringFormatter<TEdgeLabel> EdgeLabelFormatter { get; }
     }
 
-    public class EnumerableGraphBuilder<TVertex, TEdgeLabel>
+    public class ExplicitGraphBuilder<TVertex, TEdgeLabel>
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
@@ -180,7 +180,7 @@ public static class EnumerableGraph
         private IEnumerable<TVertex>? vertices;
         private IEnumerable<Edge<TVertex, TEdgeLabel>>? labeledEdges;
 
-        internal EnumerableGraphBuilder()
+        internal ExplicitGraphBuilder()
         {
             vertexEqualityComparer = EqualityComparer<TVertex>.Default;
             vertexComparer = Comparer<TVertex>.Default;
@@ -188,7 +188,7 @@ public static class EnumerableGraph
             edgeLabelFormatter = StringFormatter<TEdgeLabel>.Default;
         }
 
-        internal EnumerableGraphBuilder(IEnumerableGraph<TVertex, TEdgeLabel> fromDefinition)
+        internal ExplicitGraphBuilder(IExplicitGraph<TVertex, TEdgeLabel> fromDefinition)
         {
             if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
 
@@ -200,53 +200,53 @@ public static class EnumerableGraph
             labeledEdges = fromDefinition.LabeledEdges;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithVertexEqualityComparer(
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexEqualityComparer(
             IEqualityComparer<TVertex> comparer)
         {
             this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(
             IComparer<TVertex> comparer)
         {
             this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
             IStringFormatter<TVertex> formatter)
         {
             this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(
             IStringFormatter<TEdgeLabel> formatter)
         {
             this.edgeLabelFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithVertices(IEnumerable<TVertex> vertices)
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertices(IEnumerable<TVertex> vertices)
         {
             this.vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             return this;
         }
 
-        public EnumerableGraphBuilder<TVertex, TEdgeLabel> WithLabeledEdges(
+        public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithLabeledEdges(
             IEnumerable<Edge<TVertex, TEdgeLabel>> edges)
         {
             this.labeledEdges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 
-        public IEnumerableGraph<TVertex, TEdgeLabel> Build()
+        public IExplicitGraph<TVertex, TEdgeLabel> Build()
         {
             if (vertices == null) throw new ArgumentNullException(nameof(vertices));
             if (labeledEdges == null) throw new ArgumentNullException(nameof(labeledEdges));
 
-            return new BuiltEnumerableGraph<TVertex, TEdgeLabel>(
+            return new BuiltExplicitGraph<TVertex, TEdgeLabel>(
                 vertexEqualityComparer,
                 vertexComparer,
                 vertexFormatter,

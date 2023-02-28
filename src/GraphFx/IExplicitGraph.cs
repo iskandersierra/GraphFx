@@ -1,6 +1,6 @@
 ﻿namespace GraphFx;
 
-public interface IEnumerableGraph<TVertex> :
+public interface IExplicitGraph<TVertex> :
     IGraph<TVertex>
     where TVertex : notnull
 {
@@ -8,9 +8,9 @@ public interface IEnumerableGraph<TVertex> :
     IEnumerable<Edge<TVertex>> Edges { get; }
 }
 
-public interface IEnumerableGraph<TVertex, TEdgeLabel> :
+public interface IExplicitGraph<TVertex, TEdgeLabel> :
     IGraph<TVertex, TEdgeLabel>,
-    IEnumerableGraph<TVertex>
+    IExplicitGraph<TVertex>
     where TVertex : notnull
     where TEdgeLabel : notnull
 {
