@@ -6,7 +6,7 @@ public interface IDirectedGraphSource<TVertex, TEdgeLabel>
 {
     IEnumerable<TVertex> Vertices { get; }
 
-    IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> Edges { get; }
+    IEnumerable<Edge<TVertex, TEdgeLabel>> Edges { get; }
 
     IEqualityComparer<TVertex> VertexComparer { get; }
 

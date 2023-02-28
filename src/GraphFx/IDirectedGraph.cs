@@ -6,7 +6,7 @@ public interface IDirectedGraph<TVertex, TEdgeLabel>
 {
     IReadOnlyList<TVertex> Vertices { get; }
 
-    IReadOnlyList<LabeledEdge<TVertex, TEdgeLabel>> Edges { get; }
+    IReadOnlyList<Edge<TVertex, TEdgeLabel>> Edges { get; }
 
     IEqualityComparer<TVertex> VertexComparer { get; }
 

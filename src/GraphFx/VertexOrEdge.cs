@@ -4,7 +4,7 @@ namespace GraphFx;
 
 [GenerateOneOf]
 public partial class VertexOrLabeledEdge<TVertex, TEdgeLabel> :
-    OneOfBase<TVertex, LabeledEdge<TVertex, TEdgeLabel>>
+    OneOfBase<TVertex, Edge<TVertex, TEdgeLabel>>
     where TVertex : notnull
     where TEdgeLabel : notnull
 {

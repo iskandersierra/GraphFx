@@ -23,7 +23,7 @@ public static class SeededDirectedGraphSourceExtensions
                     queue.Enqueue(targetVertex);
                 }
 
-                yield return Edge.CreateLabeled(vertex, edge, targetVertex);
+                yield return Edge.Create(vertex, edge, targetVertex);
             }
         }
     }
@@ -50,7 +50,7 @@ public static class SeededDirectedGraphSourceExtensions
         }
     }
 
-    public static IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> GetAllEdges<TVertex, TEdgeLabel>(
+    public static IEnumerable<Edge<TVertex, TEdgeLabel>> GetAllEdges<TVertex, TEdgeLabel>(
         this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source)
         where TVertex : notnull
         where TEdgeLabel : notnull
@@ -68,7 +68,7 @@ public static class SeededDirectedGraphSourceExtensions
                     queue.Enqueue(targetVertex);
                 }
 
-                yield return Edge.CreateLabeled(vertex, edge, targetVertex);
+                yield return Edge.Create(vertex, edge, targetVertex);
             }
         }
     }

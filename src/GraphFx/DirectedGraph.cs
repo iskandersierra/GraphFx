@@ -47,18 +47,18 @@ public static class DirectedGraph
             return AddVertices((IEnumerable<TVertex>) vertices);
         }
 
-        public GraphBuilder<TVertex, TEdgeLabel> AddEdge(LabeledEdge<TVertex, TEdgeLabel> labeledEdge)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdge(Edge<TVertex, TEdgeLabel> edge)
         {
-            data.Add(labeledEdge);
+            data.Add(edge);
             return this;
         }
 
         public GraphBuilder<TVertex, TEdgeLabel> AddEdge(TVertex source, TEdgeLabel edge, TVertex target)
         {
-            return AddEdge(Edge.CreateLabeled(source, edge, target));
+            return AddEdge(Edge.Create(source, edge, target));
         }
 
-        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> edges)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(IEnumerable<Edge<TVertex, TEdgeLabel>> edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
             foreach (var edge in edges)
@@ -69,10 +69,10 @@ public static class DirectedGraph
             return this;
         }
 
-        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(params LabeledEdge<TVertex, TEdgeLabel>[] edges)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(params Edge<TVertex, TEdgeLabel>[] edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
-            return AddEdges((IEnumerable<LabeledEdge<TVertex, TEdgeLabel>>) edges);
+            return AddEdges((IEnumerable<Edge<TVertex, TEdgeLabel>>) edges);
         }
 
         public GraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(IEqualityComparer<TVertex> comparer)
@@ -135,7 +135,7 @@ public static class DirectedGraph
             var fmt = formatter ?? GraphFormatter<TVertex, TEdgeLabel>.Default;
 
             var vertexList = new List<TVertex>();
-            var edgeList = new List<LabeledEdge<TVertex, TEdgeLabel>>();
+            var edgeList = new List<Edge<TVertex, TEdgeLabel>>();
             var vertexSet = new HashSet<TVertex>(vertexComp);
 
             foreach (var item in data)
@@ -175,7 +175,7 @@ public static class DirectedGraph
     {
         internal BuiltGraph(
             IReadOnlyList<TVertex> verticesCollection,
-            IReadOnlyList<LabeledEdge<TVertex, TEdgeLabel>> edgesCollection,
+            IReadOnlyList<Edge<TVertex, TEdgeLabel>> edgesCollection,
             IEqualityComparer<TVertex> vertexComparer,
             IGraphFormatter<TVertex, TEdgeLabel> formatter)
         {
@@ -187,7 +187,7 @@ public static class DirectedGraph
 
         public IReadOnlyList<TVertex> Vertices { get; }
 
-        public IReadOnlyList<LabeledEdge<TVertex, TEdgeLabel>> Edges { get; }
+        public IReadOnlyList<Edge<TVertex, TEdgeLabel>> Edges { get; }
 
         public IEqualityComparer<TVertex> VertexComparer { get; }
 
