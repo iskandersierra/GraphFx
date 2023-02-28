@@ -116,11 +116,11 @@ public static class Commands
                 {
                     var bench = new DirectedGraphBuild();
                     bench.Size = size;
-                    bench.Setup();
-                    for (int i = 0; i < count; i++)
-                    {
-                        bench.Unlabeled();
-                    }
+                    //bench.Setup();
+                    //for (int i = 0; i < count; i++)
+                    //{
+                    //    bench.Unlabeled();
+                    //}
                 },
             };
 
