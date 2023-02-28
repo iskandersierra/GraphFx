@@ -15,7 +15,7 @@ var graph2 = DirectedGraph
     .AddEdge("A", "B")
     .AddEdge("B", "C")
     .AddEdge("C", "A")
-    .AddNodes("C", "D", "E", "F")
+    .AddVertices("C", "D", "E", "F")
     .Build();
 
 Console.WriteLine(graph2.ToEnglishCompact());

@@ -2,136 +2,136 @@
 
 public static class SeededDirectedGraphSource
 {
-    public static ISeededDirectedGraphSource<TNode, TEdge> Create<TNode, TEdge>(
-        IEnumerable<TNode> seedNodes,
-        Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode, TEdge>? formatter = null)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IEnumerable<TVertex> seedVertices,
+        Func<TVertex, IEnumerable<(TEdgeLabel, TVertex)>> getEdges,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex, TEdgeLabel>? formatter = null)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        if (seedNodes == null) throw new ArgumentNullException(nameof(seedNodes));
+        if (seedVertices == null) throw new ArgumentNullException(nameof(seedVertices));
         if (getEdges == null) throw new ArgumentNullException(nameof(getEdges));
-        nodeComparer ??= EqualityComparer<TNode>.Default;
-        formatter ??= GraphFormatter<TNode, TEdge>.Default;
+        vertexComparer ??= EqualityComparer<TVertex>.Default;
+        formatter ??= GraphFormatter<TVertex, TEdgeLabel>.Default;
 
-        return new CustomSeededDirectedGraphSource<TNode, TEdge>(seedNodes, getEdges, nodeComparer, formatter);
+        return new CustomSeededDirectedGraphSource<TVertex, TEdgeLabel>(seedVertices, getEdges, vertexComparer, formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> Create<TNode, TEdge>(
-        TNode seedNode,
-        Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode, TEdge>? formatter = null)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        TVertex seedVertex,
+        Func<TVertex, IEnumerable<(TEdgeLabel, TVertex)>> getEdges,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex, TEdgeLabel>? formatter = null)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return Create(new[] { seedNode }, getEdges, nodeComparer, formatter);
+        return Create(new[] { seedVertex }, getEdges, vertexComparer, formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> Create<TNode>(
-        IEnumerable<TNode> seedNodes,
-        Func<TNode, IEnumerable<TNode>> getEdges,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode>? formatter = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> Create<TVertex>(
+        IEnumerable<TVertex> seedVertices,
+        Func<TVertex, IEnumerable<TVertex>> getEdges,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex>? formatter = null)
+        where TVertex : notnull
     {
-        if (seedNodes == null) throw new ArgumentNullException(nameof(seedNodes));
+        if (seedVertices == null) throw new ArgumentNullException(nameof(seedVertices));
         if (getEdges == null) throw new ArgumentNullException(nameof(getEdges));
-        nodeComparer ??= EqualityComparer<TNode>.Default;
-        formatter ??= GraphFormatter<TNode>.Default;
+        vertexComparer ??= EqualityComparer<TVertex>.Default;
+        formatter ??= GraphFormatter<TVertex>.Default;
 
-        return new CustomSeededDirectedGraphSource<TNode>(seedNodes, getEdges, nodeComparer, formatter);
+        return new CustomSeededDirectedGraphSource<TVertex>(seedVertices, getEdges, vertexComparer, formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> Create<TNode>(
-        TNode seedNode,
-        Func<TNode, IEnumerable<TNode>> getEdges,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode>? formatter = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> Create<TVertex>(
+        TVertex seedVertex,
+        Func<TVertex, IEnumerable<TVertex>> getEdges,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex>? formatter = null)
+        where TVertex : notnull
     {
-        return Create(new[] { seedNode }, getEdges, nodeComparer, formatter);
+        return Create(new[] { seedVertex }, getEdges, vertexComparer, formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> Create<TNode>(
-        IEnumerable<TNode> seedNodes,
-        Func<TNode, IEnumerable<TNode>> getEdges,
-        Func<TNode, string> formatter,
-        IEqualityComparer<TNode>? nodeComparer = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> Create<TVertex>(
+        IEnumerable<TVertex> seedVertices,
+        Func<TVertex, IEnumerable<TVertex>> getEdges,
+        Func<TVertex, string> formatter,
+        IEqualityComparer<TVertex>? vertexComparer = null)
+        where TVertex : notnull
     {
-        return Create(seedNodes, getEdges, nodeComparer, GraphFormatter.Create(formatter));
+        return Create(seedVertices, getEdges, vertexComparer, GraphFormatter.Create(formatter));
     }
 
-    public static ISeededDirectedGraphSource<TNode> Create<TNode>(
-        TNode seedNode,
-        Func<TNode, IEnumerable<TNode>> getEdges,
-        Func<TNode, string> formatter,
-        IEqualityComparer<TNode>? nodeComparer = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> Create<TVertex>(
+        TVertex seedVertex,
+        Func<TVertex, IEnumerable<TVertex>> getEdges,
+        Func<TVertex, string> formatter,
+        IEqualityComparer<TVertex>? vertexComparer = null)
+        where TVertex : notnull
     {
-        return Create(seedNode, getEdges, nodeComparer, GraphFormatter.Create(formatter));
+        return Create(seedVertex, getEdges, vertexComparer, GraphFormatter.Create(formatter));
     }
 
-    private class CustomSeededDirectedGraphSource<TNode, TEdge> :
-        ISeededDirectedGraphSource<TNode, TEdge>
-        where TNode : notnull
-        where TEdge : notnull
+    private class CustomSeededDirectedGraphSource<TVertex, TEdgeLabel> :
+        ISeededDirectedGraphSource<TVertex, TEdgeLabel>
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        private readonly Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges;
+        private readonly Func<TVertex, IEnumerable<(TEdgeLabel, TVertex)>> getEdges;
 
         public CustomSeededDirectedGraphSource(
-            IEnumerable<TNode> nodes,
-            Func<TNode, IEnumerable<(TEdge, TNode)>> getEdges,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode, TEdge> formatter)
+            IEnumerable<TVertex> vertices,
+            Func<TVertex, IEnumerable<(TEdgeLabel, TVertex)>> getEdges,
+            IEqualityComparer<TVertex> vertexComparer,
+            IGraphFormatter<TVertex, TEdgeLabel> formatter)
         {
-            SeedNodes = nodes;
+            SeedVertices = vertices;
             this.getEdges = getEdges;
-            NodeComparer = nodeComparer;
+            VertexComparer = vertexComparer;
             Formatter = formatter;
         }
 
-        public IEnumerable<TNode> SeedNodes { get; }
+        public IEnumerable<TVertex> SeedVertices { get; }
 
-        public IEqualityComparer<TNode> NodeComparer { get; }
+        public IEqualityComparer<TVertex> VertexComparer { get; }
 
-        public IGraphFormatter<TNode, TEdge> Formatter { get; }
+        public IGraphFormatter<TVertex, TEdgeLabel> Formatter { get; }
 
-        public IEnumerable<(TEdge, TNode)> GetEdges(TNode node)
+        public IEnumerable<(TEdgeLabel, TVertex)> GetEdges(TVertex vertex)
         {
-            return getEdges(node);
+            return getEdges(vertex);
         }
     }
 
-    private class CustomSeededDirectedGraphSource<TNode> :
-        ISeededDirectedGraphSource<TNode>
-        where TNode : notnull
+    private class CustomSeededDirectedGraphSource<TVertex> :
+        ISeededDirectedGraphSource<TVertex>
+        where TVertex : notnull
     {
-        private readonly Func<TNode, IEnumerable<TNode>> getEdges;
+        private readonly Func<TVertex, IEnumerable<TVertex>> getEdges;
 
         public CustomSeededDirectedGraphSource(
-            IEnumerable<TNode> nodes,
-            Func<TNode, IEnumerable<TNode>> getEdges,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode> formatter)
+            IEnumerable<TVertex> vertices,
+            Func<TVertex, IEnumerable<TVertex>> getEdges,
+            IEqualityComparer<TVertex> vertexComparer,
+            IGraphFormatter<TVertex> formatter)
         {
-            SeedNodes = nodes;
+            SeedVertices = vertices;
             this.getEdges = getEdges;
-            NodeComparer = nodeComparer;
+            VertexComparer = vertexComparer;
             Formatter = formatter;
         }
 
-        public IEnumerable<TNode> SeedNodes { get; }
+        public IEnumerable<TVertex> SeedVertices { get; }
 
-        public IEqualityComparer<TNode> NodeComparer { get; }
+        public IEqualityComparer<TVertex> VertexComparer { get; }
 
-        public IGraphFormatter<TNode> Formatter { get; }
+        public IGraphFormatter<TVertex> Formatter { get; }
 
-        public IEnumerable<TNode> GetEdges(TNode node)
+        public IEnumerable<TVertex> GetEdges(TVertex vertex)
         {
-            return getEdges(node);
+            return getEdges(vertex);
         }
     }
 }

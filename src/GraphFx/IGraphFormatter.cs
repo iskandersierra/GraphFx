@@ -1,16 +1,16 @@
 namespace GraphFx;
 
-public interface IGraphFormatter<TNode, TEdge>
-    where TNode : notnull
-    where TEdge : notnull
+public interface IGraphFormatter<TVertex, TEdgeLabel>
+    where TVertex : notnull
+    where TEdgeLabel : notnull
 {
-    IStringFormatter<TNode> NodeFormatter { get; }
+    IStringFormatter<TVertex> VertexFormatter { get; }
 
-    IStringFormatter<TEdge> EdgeFormatter { get; }
+    IStringFormatter<TEdgeLabel> EdgeFormatter { get; }
 }
 
-public interface IGraphFormatter<TNode>
-    where TNode : notnull
+public interface IGraphFormatter<TVertex>
+    where TVertex : notnull
 {
-    IStringFormatter<TNode> NodeFormatter { get; }
+    IStringFormatter<TVertex> VertexFormatter { get; }
 }

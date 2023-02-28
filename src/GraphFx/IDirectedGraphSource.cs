@@ -1,26 +1,26 @@
 ﻿namespace GraphFx;
 
-public interface IDirectedGraphSource<TNode, TEdge>
-    where TNode : notnull
-    where TEdge : notnull
+public interface IDirectedGraphSource<TVertex, TEdgeLabel>
+    where TVertex : notnull
+    where TEdgeLabel : notnull
 {
-    IEnumerable<TNode> Nodes { get; }
+    IEnumerable<TVertex> Vertices { get; }
 
-    IEnumerable<LabeledEdgeDefinition<TNode, TEdge>> Edges { get; }
+    IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> Edges { get; }
 
-    IEqualityComparer<TNode> NodeComparer { get; }
+    IEqualityComparer<TVertex> VertexComparer { get; }
 
-    IGraphFormatter<TNode, TEdge> Formatter { get; }
+    IGraphFormatter<TVertex, TEdgeLabel> Formatter { get; }
 }
 
-public interface IDirectedGraphSource<TNode>
-    where TNode : notnull
+public interface IDirectedGraphSource<TVertex>
+    where TVertex : notnull
 {
-    IEnumerable<TNode> Nodes { get; }
+    IEnumerable<TVertex> Vertices { get; }
 
-    IEnumerable<EdgeDefinition<TNode>> Edges { get; }
+    IEnumerable<Edge<TVertex>> Edges { get; }
 
-    IEqualityComparer<TNode> NodeComparer { get; }
+    IEqualityComparer<TVertex> VertexComparer { get; }
 
-    IGraphFormatter<TNode> Formatter { get; }
+    IGraphFormatter<TVertex> Formatter { get; }
 }

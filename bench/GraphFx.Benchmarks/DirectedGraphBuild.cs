@@ -5,7 +5,7 @@ namespace GraphFx.Benchmarks;
 [MemoryDiagnoser]
 public class DirectedGraphBuild
 {
-    [Params(100, 1000, 100_000)]
+    [Params(100, 1_000, 10_000)]
     public int Size { get; set; }
 
     [Params(10)]

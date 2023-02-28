@@ -2,130 +2,130 @@ namespace GraphFx;
 
 public static class GraphFormatter
 {
-    public static IGraphFormatter<TNode, TEdge> Create<TNode, TEdge>(
-        IStringFormatter<TNode> nodeFormatter,
-        IStringFormatter<TEdge> edgeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IStringFormatter<TVertex> vertexFormatter,
+        IStringFormatter<TEdgeLabel> edgeFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(nodeFormatter, edgeFormatter);
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(vertexFormatter, edgeFormatter);
     }
 
-    public static IGraphFormatter<TNode, TEdge> Create<TNode, TEdge>(
-        Func<TNode, string> nodeFormatter,
-        Func<TEdge, string> edgeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        Func<TVertex, string> vertexFormatter,
+        Func<TEdgeLabel, string> edgeFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(
-            StringFormatter.Create(nodeFormatter),
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(
+            StringFormatter.Create(vertexFormatter),
             StringFormatter.Create(edgeFormatter));
     }
 
-    private class CustomGraphFormatter<TNode, TEdge> : IGraphFormatter<TNode, TEdge>
-        where TNode : notnull
-        where TEdge : notnull
+    private class CustomGraphFormatter<TVertex, TEdgeLabel> : IGraphFormatter<TVertex, TEdgeLabel>
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         public CustomGraphFormatter(
-            IStringFormatter<TNode> nodeFormatter,
-            IStringFormatter<TEdge> edgeFormatter)
+            IStringFormatter<TVertex> vertexFormatter,
+            IStringFormatter<TEdgeLabel> edgeFormatter)
         {
-            NodeFormatter = nodeFormatter ?? throw new ArgumentNullException(nameof(nodeFormatter));
+            VertexFormatter = vertexFormatter ?? throw new ArgumentNullException(nameof(vertexFormatter));
             EdgeFormatter = edgeFormatter ?? throw new ArgumentNullException(nameof(edgeFormatter));
         }
 
-        public IStringFormatter<TNode> NodeFormatter { get; }
+        public IStringFormatter<TVertex> VertexFormatter { get; }
 
-        public IStringFormatter<TEdge> EdgeFormatter { get; }
+        public IStringFormatter<TEdgeLabel> EdgeFormatter { get; }
     }
 
-    public static IGraphFormatter<TNode> Create<TNode>(
-        IStringFormatter<TNode> nodeFormatter)
-        where TNode : notnull
+    public static IGraphFormatter<TVertex> Create<TVertex>(
+        IStringFormatter<TVertex> vertexFormatter)
+        where TVertex : notnull
     {
-        return new CustomGraphFormatter<TNode>(nodeFormatter);
+        return new CustomGraphFormatter<TVertex>(vertexFormatter);
     }
 
-    public static IGraphFormatter<TNode> Create<TNode>(
-        Func<TNode, string> nodeFormatter)
-        where TNode : notnull
+    public static IGraphFormatter<TVertex> Create<TVertex>(
+        Func<TVertex, string> vertexFormatter)
+        where TVertex : notnull
     {
-        return new CustomGraphFormatter<TNode>(StringFormatter.Create(nodeFormatter));
+        return new CustomGraphFormatter<TVertex>(StringFormatter.Create(vertexFormatter));
     }
 
-    private class CustomGraphFormatter<TNode> : IGraphFormatter<TNode>
-        where TNode : notnull
+    private class CustomGraphFormatter<TVertex> : IGraphFormatter<TVertex>
+        where TVertex : notnull
     {
         public CustomGraphFormatter(
-            IStringFormatter<TNode> nodeFormatter)
+            IStringFormatter<TVertex> vertexFormatter)
         {
-            NodeFormatter = nodeFormatter ?? throw new ArgumentNullException(nameof(nodeFormatter));
+            VertexFormatter = vertexFormatter ?? throw new ArgumentNullException(nameof(vertexFormatter));
         }
 
-        public IStringFormatter<TNode> NodeFormatter { get; }
+        public IStringFormatter<TVertex> VertexFormatter { get; }
     }
 
-    public static IGraphFormatter<TNode, TEdge> WithNodeFormatter<TNode, TEdge>(
-        this IGraphFormatter<TNode, TEdge> formatter,
-        IStringFormatter<TNode> nodeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> WithVertexFormatter<TVertex, TEdgeLabel>(
+        this IGraphFormatter<TVertex, TEdgeLabel> formatter,
+        IStringFormatter<TVertex> vertexFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(nodeFormatter, formatter.EdgeFormatter);
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(vertexFormatter, formatter.EdgeFormatter);
     }
 
-    public static IGraphFormatter<TNode, TEdge> WithNodeFormatter<TNode, TEdge>(
-        this IGraphFormatter<TNode, TEdge> formatter,
-        Func<TNode, string> nodeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> WithVertexFormatter<TVertex, TEdgeLabel>(
+        this IGraphFormatter<TVertex, TEdgeLabel> formatter,
+        Func<TVertex, string> vertexFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(StringFormatter.Create(nodeFormatter), formatter.EdgeFormatter);
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(StringFormatter.Create(vertexFormatter), formatter.EdgeFormatter);
     }
 
-    public static IGraphFormatter<TNode, TEdge> WithEdgeFormatter<TNode, TEdge>(
-        this IGraphFormatter<TNode, TEdge> formatter,
-        IStringFormatter<TEdge> edgeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> WithEdgeFormatter<TVertex, TEdgeLabel>(
+        this IGraphFormatter<TVertex, TEdgeLabel> formatter,
+        IStringFormatter<TEdgeLabel> edgeFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(formatter.NodeFormatter, edgeFormatter);
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(formatter.VertexFormatter, edgeFormatter);
     }
 
-    public static IGraphFormatter<TNode, TEdge> WithEdgeFormatter<TNode, TEdge>(
-        this IGraphFormatter<TNode, TEdge> formatter,
-        Func<TEdge, string> edgeFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IGraphFormatter<TVertex, TEdgeLabel> WithEdgeFormatter<TVertex, TEdgeLabel>(
+        this IGraphFormatter<TVertex, TEdgeLabel> formatter,
+        Func<TEdgeLabel, string> edgeFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new CustomGraphFormatter<TNode, TEdge>(formatter.NodeFormatter, StringFormatter.Create(edgeFormatter));
+        return new CustomGraphFormatter<TVertex, TEdgeLabel>(formatter.VertexFormatter, StringFormatter.Create(edgeFormatter));
     }
 }
 
-public static class GraphFormatter<TNode, TEdge>
-    where TNode : notnull
-    where TEdge : notnull
+public static class GraphFormatter<TVertex, TEdgeLabel>
+    where TVertex : notnull
+    where TEdgeLabel : notnull
 {
-    public static readonly IGraphFormatter<TNode, TEdge> Default = new DefaultGraphFormatter<TNode, TEdge>();
+    public static readonly IGraphFormatter<TVertex, TEdgeLabel> Default = new DefaultGraphFormatter<TVertex, TEdgeLabel>();
 
-    private sealed class DefaultGraphFormatter<TNodeValue, TEdgeValue> : IGraphFormatter<TNodeValue, TEdgeValue>
-        where TNodeValue : notnull
+    private sealed class DefaultGraphFormatter<TVertexValue, TEdgeValue> : IGraphFormatter<TVertexValue, TEdgeValue>
+        where TVertexValue : notnull
         where TEdgeValue : notnull
     {
-        public IStringFormatter<TNodeValue> NodeFormatter => StringFormatter<TNodeValue>.Default;
+        public IStringFormatter<TVertexValue> VertexFormatter => StringFormatter<TVertexValue>.Default;
 
         public IStringFormatter<TEdgeValue> EdgeFormatter => StringFormatter<TEdgeValue>.Default;
     }
 }
 
-public static class GraphFormatter<TNode>
-    where TNode : notnull
+public static class GraphFormatter<TVertex>
+    where TVertex : notnull
 {
-    public static readonly IGraphFormatter<TNode> Default = new DefaultGraphFormatter<TNode>();
+    public static readonly IGraphFormatter<TVertex> Default = new DefaultGraphFormatter<TVertex>();
 
-    private sealed class DefaultGraphFormatter<TNodeValue> : IGraphFormatter<TNodeValue>
-        where TNodeValue : notnull
+    private sealed class DefaultGraphFormatter<TVertexValue> : IGraphFormatter<TVertexValue>
+        where TVertexValue : notnull
     {
-        public IStringFormatter<TNodeValue> NodeFormatter => StringFormatter<TNodeValue>.Default;
+        public IStringFormatter<TVertexValue> VertexFormatter => StringFormatter<TVertexValue>.Default;
     }
 }

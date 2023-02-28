@@ -4,319 +4,319 @@ namespace GraphFx;
 
 public static class SeededDirectedGraphSourceExtensions
 {
-    public static IEnumerable<NodeOrLabeledEdge<TNode, TEdge>> GetAllNodesAndEdges<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IEnumerable<VertexOrLabeledEdge<TVertex, TEdgeLabel>> GetAllVerticesAndEdges<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            yield return node;
-            foreach (var (edge, targetNode) in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            yield return vertex;
+            foreach (var (edge, targetVertex) in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
 
-                yield return EdgeDefinition.Create(node, edge, targetNode);
+                yield return Edge.CreateLabeled(vertex, edge, targetVertex);
             }
         }
     }
 
-    public static IEnumerable<TNode> GetAllNodes<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IEnumerable<TVertex> GetAllVertices<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            yield return node;
-            foreach (var (_, targetNode) in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            yield return vertex;
+            foreach (var (_, targetVertex) in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
             }
         }
     }
 
-    public static IEnumerable<LabeledEdgeDefinition<TNode, TEdge>> GetAllEdges<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> GetAllEdges<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            foreach (var (edge, targetNode) in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            foreach (var (edge, targetVertex) in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
 
-                yield return EdgeDefinition.Create(node, edge, targetNode);
+                yield return Edge.CreateLabeled(vertex, edge, targetVertex);
             }
         }
     }
 
-    public static IDirectedGraph<TNode, TEdge> ToDirectedGraph<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source)
-        where TNode : notnull
-        where TEdge : notnull
+    public static IDirectedGraph<TVertex, TEdgeLabel> ToDirectedGraph<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
 
         var builder = DirectedGraph
-            .Builder<TNode, TEdge>()
-            .WithNodeComparer(source.NodeComparer);
+            .Builder<TVertex, TEdgeLabel>()
+            .WithVertexComparer(source.VertexComparer);
 
-        foreach (var node in source.GetAllNodesAndEdges())
+        foreach (var vertex in source.GetAllVerticesAndEdges())
         {
-            node.Switch(
-                n => builder.AddNode(n),
-                t => builder.AddEdge(t.Source, t.Edge, t.Target));
+            vertex.Switch(
+                n => builder.AddVertex(n),
+                t => builder.AddEdge(t.Source, t.Label, t.Target));
         }
 
         return builder.Build();
     }
 
-    public static IEnumerable<NodeOrEdge<TNode>> GetAllNodesAndEdges<TNode>(
-        this ISeededDirectedGraphSource<TNode> source)
-        where TNode : notnull
+    public static IEnumerable<VertexOrEdge<TVertex>> GetAllVerticesAndEdges<TVertex>(
+        this ISeededDirectedGraphSource<TVertex> source)
+        where TVertex : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            yield return node;
-            foreach (var targetNode in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            yield return vertex;
+            foreach (var targetVertex in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
 
-                yield return EdgeDefinition.Create(node, targetNode);
+                yield return Edge.Create(vertex, targetVertex);
             }
         }
     }
 
-    public static IEnumerable<TNode> GetAllNodes<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode> source)
-        where TNode : notnull
+    public static IEnumerable<TVertex> GetAllVertices<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex> source)
+        where TVertex : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            yield return node;
-            foreach (var targetNode in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            yield return vertex;
+            foreach (var targetVertex in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
             }
         }
     }
 
-    public static IEnumerable<EdgeDefinition<TNode>> GetAllEdges<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode> source)
-        where TNode : notnull
+    public static IEnumerable<Edge<TVertex>> GetAllEdges<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex> source)
+        where TVertex : notnull
     {
-        var nodes = new HashSet<TNode>(source.NodeComparer);
-        var queue = new Queue<TNode>(source.SeedNodes);
+        var vertices = new HashSet<TVertex>(source.VertexComparer);
+        var queue = new Queue<TVertex>(source.SeedVertices);
 
         while (queue.Count > 0)
         {
-            var node = queue.Dequeue();
-            foreach (var targetNode in source.GetEdges(node))
+            var vertex = queue.Dequeue();
+            foreach (var targetVertex in source.GetEdges(vertex))
             {
-                if (nodes.Add(targetNode))
+                if (vertices.Add(targetVertex))
                 {
-                    queue.Enqueue(targetNode);
+                    queue.Enqueue(targetVertex);
                 }
 
-                yield return EdgeDefinition.Create(node, targetNode);
+                yield return Edge.Create(vertex, targetVertex);
             }
         }
     }
 
-    public static IDirectedGraph<TNode> ToDirectedGraph<TNode>(
-        this ISeededDirectedGraphSource<TNode> source)
-        where TNode : notnull
+    public static IDirectedGraph<TVertex> ToDirectedGraph<TVertex>(
+        this ISeededDirectedGraphSource<TVertex> source)
+        where TVertex : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
 
         var builder = DirectedGraph
-            .Builder<TNode>()
-            .WithNodeComparer(source.NodeComparer)
+            .Builder<TVertex>()
+            .WithVertexComparer(source.VertexComparer)
             .WithFormatter(source.Formatter);
 
-        foreach (var node in source.GetAllNodesAndEdges())
+        foreach (var vertex in source.GetAllVerticesAndEdges())
         {
-            node.Switch(
-                n => builder.AddNode(n),
+            vertex.Switch(
+                n => builder.AddVertex(n),
                 t => builder.AddEdge(t.Source, t.Target));
         }
 
         return builder.Build();
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> WithNodeComparer<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source,
-        IEqualityComparer<TNode> nodeComparer)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> WithVertexComparer<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source,
+        IEqualityComparer<TVertex> vertexComparer)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
-        if (nodeComparer == null) throw new ArgumentNullException(nameof(nodeComparer));
+        if (vertexComparer == null) throw new ArgumentNullException(nameof(vertexComparer));
 
         return SeededDirectedGraphSource.Create(
-            source.SeedNodes,
+            source.SeedVertices,
             source.GetEdges,
-            nodeComparer,
+            vertexComparer,
             source.Formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> WithFormatter<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source,
-        IGraphFormatter<TNode, TEdge> formatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> WithFormatter<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source,
+        IGraphFormatter<TVertex, TEdgeLabel> formatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (formatter == null) throw new ArgumentNullException(nameof(formatter));
 
         return SeededDirectedGraphSource.Create(
-            source.SeedNodes,
+            source.SeedVertices,
             source.GetEdges,
-            source.NodeComparer,
+            source.VertexComparer,
             formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> WithFormatter<TNode, TEdge>(
-        this ISeededDirectedGraphSource<TNode, TEdge> source,
-        Func<IGraphFormatter<TNode, TEdge>, IGraphFormatter<TNode, TEdge>> updateFormatter)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> WithFormatter<TVertex, TEdgeLabel>(
+        this ISeededDirectedGraphSource<TVertex, TEdgeLabel> source,
+        Func<IGraphFormatter<TVertex, TEdgeLabel>, IGraphFormatter<TVertex, TEdgeLabel>> updateFormatter)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (updateFormatter == null) throw new ArgumentNullException(nameof(updateFormatter));
 
         return SeededDirectedGraphSource.Create(
-            source.SeedNodes,
+            source.SeedVertices,
             source.GetEdges,
-            source.NodeComparer,
+            source.VertexComparer,
             updateFormatter(source.Formatter));
     }
 
-    public static ISeededDirectedGraphSource<TNode> WithNodeComparer<TNode>(
-        this ISeededDirectedGraphSource<TNode> source,
-        IEqualityComparer<TNode> nodeComparer)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> WithVertexComparer<TVertex>(
+        this ISeededDirectedGraphSource<TVertex> source,
+        IEqualityComparer<TVertex> vertexComparer)
+        where TVertex : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
-        if (nodeComparer == null) throw new ArgumentNullException(nameof(nodeComparer));
+        if (vertexComparer == null) throw new ArgumentNullException(nameof(vertexComparer));
 
         return SeededDirectedGraphSource.Create(
-            source.SeedNodes,
+            source.SeedVertices,
             source.GetEdges,
-            nodeComparer,
+            vertexComparer,
             source.Formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> WithFormatter<TNode>(
-        this ISeededDirectedGraphSource<TNode> source,
-        IGraphFormatter<TNode> formatter)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> WithFormatter<TVertex>(
+        this ISeededDirectedGraphSource<TVertex> source,
+        IGraphFormatter<TVertex> formatter)
+        where TVertex : notnull
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (formatter == null) throw new ArgumentNullException(nameof(formatter));
 
         return SeededDirectedGraphSource.Create(
-            source.SeedNodes,
+            source.SeedVertices,
             source.GetEdges,
-            source.NodeComparer,
+            source.VertexComparer,
             formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> ToSeededDirectedGraph<TNode, TEdge>(
-        this IDictionary<TNode, ICollection<(TEdge Edge, TNode Node)>> adjacencyGraph,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode, TEdge>? formatter = null)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> ToSeededDirectedGraph<TVertex, TEdgeLabel>(
+        this IDictionary<TVertex, ICollection<(TEdgeLabel Edge, TVertex Vertex)>> adjacencyGraph,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex, TEdgeLabel>? formatter = null)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
         return SeededDirectedGraphSource.Create(
             adjacencyGraph.Keys,
-            node => adjacencyGraph.TryGetValue(node, out var edges) ? edges : Enumerable.Empty<(TEdge, TNode)>(),
-            nodeComparer,
+            vertex => adjacencyGraph.TryGetValue(vertex, out var edges) ? edges : Enumerable.Empty<(TEdgeLabel, TVertex)>(),
+            vertexComparer,
             formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode, TEdge> ToSeededDirectedGraph<TNode, TEdge>(
-        this IEnumerable<(TNode Source, IEnumerable<(TEdge Edge, TNode Target)> Edges)> adjacencyGraph,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode, TEdge>? formatter = null)
-        where TNode : notnull
-        where TEdge : notnull
+    public static ISeededDirectedGraphSource<TVertex, TEdgeLabel> ToSeededDirectedGraph<TVertex, TEdgeLabel>(
+        this IEnumerable<(TVertex Source, IEnumerable<(TEdgeLabel Edge, TVertex Target)> Edges)> adjacencyGraph,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex, TEdgeLabel>? formatter = null)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
         return adjacencyGraph
             .ToDictionary(
                 t => t.Source,
-                t => t.Edges.Select(e => (e.Edge, e.Target)).ToArray() as ICollection<(TEdge, TNode)>,
-                nodeComparer)
-            .ToSeededDirectedGraph(nodeComparer, formatter);
+                t => t.Edges.Select(e => (e.Edge, e.Target)).ToArray() as ICollection<(TEdgeLabel, TVertex)>,
+                vertexComparer)
+            .ToSeededDirectedGraph(vertexComparer, formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> ToSeededDirectedGraph<TNode>(
-        this IDictionary<TNode, ICollection<TNode>> adjacencyGraph,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode>? formatter = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> ToSeededDirectedGraph<TVertex>(
+        this IDictionary<TVertex, ICollection<TVertex>> adjacencyGraph,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex>? formatter = null)
+        where TVertex : notnull
     {
         if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
         return SeededDirectedGraphSource.Create(
             adjacencyGraph.Keys,
-            node => adjacencyGraph.TryGetValue(node, out var edges) ? edges : Enumerable.Empty<TNode>(),
-            nodeComparer,
+            vertex => adjacencyGraph.TryGetValue(vertex, out var edges) ? edges : Enumerable.Empty<TVertex>(),
+            vertexComparer,
             formatter);
     }
 
-    public static ISeededDirectedGraphSource<TNode> ToSeededDirectedGraph<TNode>(
-        this IEnumerable<(TNode Node, IEnumerable<TNode> Edges)> adjacencyGraph,
-        IEqualityComparer<TNode>? nodeComparer = null,
-        IGraphFormatter<TNode>? formatter = null)
-        where TNode : notnull
+    public static ISeededDirectedGraphSource<TVertex> ToSeededDirectedGraph<TVertex>(
+        this IEnumerable<(TVertex Vertex, IEnumerable<TVertex> Edges)> adjacencyGraph,
+        IEqualityComparer<TVertex>? vertexComparer = null,
+        IGraphFormatter<TVertex>? formatter = null)
+        where TVertex : notnull
     {
         if (adjacencyGraph == null) throw new ArgumentNullException(nameof(adjacencyGraph));
 
         return adjacencyGraph
-            .ToDictionary(x => x.Node, x => x.Edges.ToArray() as ICollection<TNode>, nodeComparer)
-            .ToSeededDirectedGraph(nodeComparer, formatter);
+            .ToDictionary(x => x.Vertex, x => x.Edges.ToArray() as ICollection<TVertex>, vertexComparer)
+            .ToSeededDirectedGraph(vertexComparer, formatter);
     }
 }

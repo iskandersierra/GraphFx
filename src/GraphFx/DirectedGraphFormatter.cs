@@ -2,36 +2,36 @@
 
 namespace GraphFx;
 
-public static class DirectedGraphFormatter<TNode, TEdge>
-    where TNode : notnull
-    where TEdge : notnull
+public static class DirectedGraphFormatter<TVertex, TEdgeLabel>
+    where TVertex : notnull
+    where TEdgeLabel : notnull
 {
     private const string StartArrow = " == ";
     private const string EndArrow = " => ";
 
-    public static readonly IDirectedGraphFormatter<TNode, TEdge> EnglishReadable = new EnglishReadableFormatter();
-    public static readonly IDirectedGraphFormatter<TNode, TEdge> EnglishCompact = new EnglishCompactFormatter();
+    public static readonly IDirectedGraphFormatter<TVertex, TEdgeLabel> EnglishReadable = new EnglishReadableFormatter();
+    public static readonly IDirectedGraphFormatter<TVertex, TEdgeLabel> EnglishCompact = new EnglishCompactFormatter();
 
-    private class EnglishReadableFormatter : IDirectedGraphFormatter<TNode, TEdge>
+    private class EnglishReadableFormatter : IDirectedGraphFormatter<TVertex, TEdgeLabel>
     {
         private const string Indent = "    ";
 
-        public string FormatGraph(IDirectedGraph<TNode, TEdge> graph)
+        public string FormatGraph(IDirectedGraph<TVertex, TEdgeLabel> graph)
         {
             var sb = new StringBuilder();
-            sb.Append("Nodes (").Append(graph.Nodes.Count).AppendLine("):");
-            foreach (var node in graph.Nodes)
+            sb.Append("Vertices (").Append(graph.Vertices.Count).AppendLine("):");
+            foreach (var vertex in graph.Vertices)
             {
-                var nodeFormat = graph.Formatter.NodeFormatter.Format(node);
-                sb.Append(Indent).AppendLine(nodeFormat);
+                var vertexFormat = graph.Formatter.VertexFormatter.Format(vertex);
+                sb.Append(Indent).AppendLine(vertexFormat);
             }
 
             sb.Append("Edges (").Append(graph.Edges.Count).AppendLine("):");
             foreach (var edge in graph.Edges)
             {
-                var sourceFormat = graph.Formatter.NodeFormatter.Format(edge.Source);
-                var edgeFormat = graph.Formatter.EdgeFormatter.Format(edge.Edge);
-                var targetFormat = graph.Formatter.NodeFormatter.Format(edge.Target);
+                var sourceFormat = graph.Formatter.VertexFormatter.Format(edge.Source);
+                var edgeFormat = graph.Formatter.EdgeFormatter.Format(edge.Label);
+                var targetFormat = graph.Formatter.VertexFormatter.Format(edge.Target);
                 sb.Append(Indent)
                     .Append(sourceFormat).Append(StartArrow)
                     .Append(edgeFormat).Append(EndArrow)
@@ -42,24 +42,24 @@ public static class DirectedGraphFormatter<TNode, TEdge>
         }
     }
 
-    private class EnglishCompactFormatter : IDirectedGraphFormatter<TNode, TEdge>
+    private class EnglishCompactFormatter : IDirectedGraphFormatter<TVertex, TEdgeLabel>
     {
         private const string Separator = ", ";
 
-        public string FormatGraph(IDirectedGraph<TNode, TEdge> graph)
+        public string FormatGraph(IDirectedGraph<TVertex, TEdgeLabel> graph)
         {
             var sb = new StringBuilder();
-            sb.Append("Nodes (").Append(graph.Nodes.Count).Append("): ");
+            sb.Append("Vertices (").Append(graph.Vertices.Count).Append("): ");
             var first = true;
-            foreach (var node in graph.Nodes)
+            foreach (var vertex in graph.Vertices)
             {
                 if (!first)
                 {
                     sb.Append(Separator);
                 }
 
-                var nodeFormat = graph.Formatter.NodeFormatter.Format(node);
-                sb.Append(nodeFormat);
+                var vertexFormat = graph.Formatter.VertexFormatter.Format(vertex);
+                sb.Append(vertexFormat);
                 first = false;
             }
 
@@ -74,9 +74,9 @@ public static class DirectedGraphFormatter<TNode, TEdge>
                     sb.Append(Separator);
                 }
 
-                var sourceFormat = graph.Formatter.NodeFormatter.Format(edge.Source);
-                var edgeFormat = graph.Formatter.EdgeFormatter.Format(edge.Edge);
-                var targetFormat = graph.Formatter.NodeFormatter.Format(edge.Target);
+                var sourceFormat = graph.Formatter.VertexFormatter.Format(edge.Source);
+                var edgeFormat = graph.Formatter.EdgeFormatter.Format(edge.Label);
+                var targetFormat = graph.Formatter.VertexFormatter.Format(edge.Target);
                 sb.Append(sourceFormat).Append(StartArrow)
                     .Append(edgeFormat).Append(EndArrow)
                     .Append(targetFormat);
@@ -90,33 +90,33 @@ public static class DirectedGraphFormatter<TNode, TEdge>
     }
 }
 
-public static class DirectedGraphFormatter<TNode>
-    where TNode : notnull
+public static class DirectedGraphFormatter<TVertex>
+    where TVertex : notnull
 {
     private const string Arrow = " ==> ";
 
-    public static readonly IDirectedGraphFormatter<TNode> EnglishReadable = new EnglishReadableFormatter();
-    public static readonly IDirectedGraphFormatter<TNode> EnglishCompact = new EnglishCompactFormatter();
+    public static readonly IDirectedGraphFormatter<TVertex> EnglishReadable = new EnglishReadableFormatter();
+    public static readonly IDirectedGraphFormatter<TVertex> EnglishCompact = new EnglishCompactFormatter();
 
-    private class EnglishReadableFormatter : IDirectedGraphFormatter<TNode>
+    private class EnglishReadableFormatter : IDirectedGraphFormatter<TVertex>
     {
         private const string Indent = "    ";
 
-        public string FormatGraph(IDirectedGraph<TNode> graph)
+        public string FormatGraph(IDirectedGraph<TVertex> graph)
         {
             var sb = new StringBuilder();
-            sb.Append("Nodes (").Append(graph.Nodes.Count).AppendLine("):");
-            foreach (var node in graph.Nodes)
+            sb.Append("Vertices (").Append(graph.Vertices.Count).AppendLine("):");
+            foreach (var vertex in graph.Vertices)
             {
-                var nodeFormat = graph.Formatter.NodeFormatter.Format(node);
-                sb.Append(Indent).AppendLine(nodeFormat);
+                var vertexFormat = graph.Formatter.VertexFormatter.Format(vertex);
+                sb.Append(Indent).AppendLine(vertexFormat);
             }
 
             sb.Append("Edges (").Append(graph.Edges.Count).AppendLine("):");
             foreach (var edge in graph.Edges)
             {
-                var sourceFormat = graph.Formatter.NodeFormatter.Format(edge.Source);
-                var targetFormat = graph.Formatter.NodeFormatter.Format(edge.Target);
+                var sourceFormat = graph.Formatter.VertexFormatter.Format(edge.Source);
+                var targetFormat = graph.Formatter.VertexFormatter.Format(edge.Target);
                 sb.Append(Indent)
                     .Append(sourceFormat).Append(Arrow).AppendLine(targetFormat);
             }
@@ -125,24 +125,24 @@ public static class DirectedGraphFormatter<TNode>
         }
     }
 
-    private class EnglishCompactFormatter : IDirectedGraphFormatter<TNode>
+    private class EnglishCompactFormatter : IDirectedGraphFormatter<TVertex>
     {
         private const string Separator = ", ";
         
-        public string FormatGraph(IDirectedGraph<TNode> graph)
+        public string FormatGraph(IDirectedGraph<TVertex> graph)
         {
             var sb = new StringBuilder();
-            sb.Append("Nodes (").Append(graph.Nodes.Count).Append("): ");
+            sb.Append("Vertices (").Append(graph.Vertices.Count).Append("): ");
             var first = true;
-            foreach (var node in graph.Nodes)
+            foreach (var vertex in graph.Vertices)
             {
                 if (!first)
                 {
                     sb.Append(Separator);
                 }
 
-                var nodeFormat = graph.Formatter.NodeFormatter.Format(node);
-                sb.Append(nodeFormat);
+                var vertexFormat = graph.Formatter.VertexFormatter.Format(vertex);
+                sb.Append(vertexFormat);
                 first = false;
             }
 
@@ -157,8 +157,8 @@ public static class DirectedGraphFormatter<TNode>
                     sb.Append(Separator);
                 }
 
-                var sourceFormat = graph.Formatter.NodeFormatter.Format(edge.Source);
-                var targetFormat = graph.Formatter.NodeFormatter.Format(edge.Target);
+                var sourceFormat = graph.Formatter.VertexFormatter.Format(edge.Source);
+                var targetFormat = graph.Formatter.VertexFormatter.Format(edge.Target);
                 sb.Append(sourceFormat).Append(Arrow).Append(targetFormat);
                 first = false;
             }
@@ -172,33 +172,33 @@ public static class DirectedGraphFormatter<TNode>
 
 public static class DirectedGraphFormatter
 {
-    public static string ToEnglishReadable<TNode, TEdge>(
-        this IDirectedGraph<TNode, TEdge> graph)
-        where TNode : notnull
-        where TEdge : notnull
+    public static string ToEnglishReadable<TVertex, TEdgeLabel>(
+        this IDirectedGraph<TVertex, TEdgeLabel> graph)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return DirectedGraphFormatter<TNode, TEdge>.EnglishReadable.FormatGraph(graph);
+        return DirectedGraphFormatter<TVertex, TEdgeLabel>.EnglishReadable.FormatGraph(graph);
     }
 
-    public static string ToEnglishCompact<TNode, TEdge>(
-        this IDirectedGraph<TNode, TEdge> graph)
-        where TNode : notnull
-        where TEdge : notnull
+    public static string ToEnglishCompact<TVertex, TEdgeLabel>(
+        this IDirectedGraph<TVertex, TEdgeLabel> graph)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return DirectedGraphFormatter<TNode, TEdge>.EnglishCompact.FormatGraph(graph);
+        return DirectedGraphFormatter<TVertex, TEdgeLabel>.EnglishCompact.FormatGraph(graph);
     }
 
-    public static string ToEnglishReadable<TNode>(
-        this IDirectedGraph<TNode> graph)
-        where TNode : notnull
+    public static string ToEnglishReadable<TVertex>(
+        this IDirectedGraph<TVertex> graph)
+        where TVertex : notnull
     {
-        return DirectedGraphFormatter<TNode>.EnglishReadable.FormatGraph(graph);
+        return DirectedGraphFormatter<TVertex>.EnglishReadable.FormatGraph(graph);
     }
 
-    public static string ToEnglishCompact<TNode>(
-        this IDirectedGraph<TNode> graph)
-        where TNode : notnull
+    public static string ToEnglishCompact<TVertex>(
+        this IDirectedGraph<TVertex> graph)
+        where TVertex : notnull
     {
-        return DirectedGraphFormatter<TNode>.EnglishCompact.FormatGraph(graph);
+        return DirectedGraphFormatter<TVertex>.EnglishCompact.FormatGraph(graph);
     }
 }

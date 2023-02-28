@@ -2,63 +2,63 @@
 
 public static class DirectedGraph
 {
-    public static GraphBuilder<TNode, TEdge> Builder<TNode, TEdge>()
-        where TNode : notnull
-        where TEdge : notnull
+    public static GraphBuilder<TVertex, TEdgeLabel> Builder<TVertex, TEdgeLabel>()
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        return new GraphBuilder<TNode, TEdge>();
+        return new GraphBuilder<TVertex, TEdgeLabel>();
     }
 
-    public class GraphBuilder<TNode, TEdge>
-        where TNode : notnull
-        where TEdge : notnull
+    public class GraphBuilder<TVertex, TEdgeLabel>
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
-        private readonly List<NodeOrLabeledEdge<TNode, TEdge>> data = new();
+        private readonly List<VertexOrLabeledEdge<TVertex, TEdgeLabel>> data = new();
 
-        private IEqualityComparer<TNode>? nodeComparer;
-        private IGraphFormatter<TNode, TEdge>? formatter;
+        private IEqualityComparer<TVertex>? vertexComparer;
+        private IGraphFormatter<TVertex, TEdgeLabel>? formatter;
 
 
         internal GraphBuilder()
         {
         }
 
-        public GraphBuilder<TNode, TEdge> AddNode(TNode node)
+        public GraphBuilder<TVertex, TEdgeLabel> AddVertex(TVertex vertex)
         {
-            if (node == null) throw new ArgumentNullException(nameof(node));
-            data.Add(node);
+            if (vertex == null) throw new ArgumentNullException(nameof(vertex));
+            data.Add(vertex);
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> AddNodes(IEnumerable<TNode> nodes)
+        public GraphBuilder<TVertex, TEdgeLabel> AddVertices(IEnumerable<TVertex> vertices)
         {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            foreach (var node in nodes)
+            if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+            foreach (var vertex in vertices)
             {
-                AddNode(node);
+                AddVertex(vertex);
             }
 
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> AddNodes(params TNode[] nodes)
+        public GraphBuilder<TVertex, TEdgeLabel> AddVertices(params TVertex[] vertices)
         {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            return AddNodes((IEnumerable<TNode>) nodes);
+            if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+            return AddVertices((IEnumerable<TVertex>) vertices);
         }
 
-        public GraphBuilder<TNode, TEdge> AddEdge(LabeledEdgeDefinition<TNode, TEdge> labeledEdge)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdge(LabeledEdge<TVertex, TEdgeLabel> labeledEdge)
         {
             data.Add(labeledEdge);
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> AddEdge(TNode source, TEdge edge, TNode target)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdge(TVertex source, TEdgeLabel edge, TVertex target)
         {
-            return AddEdge(EdgeDefinition.Create(source, edge, target));
+            return AddEdge(Edge.CreateLabeled(source, edge, target));
         }
 
-        public GraphBuilder<TNode, TEdge> AddEdges(IEnumerable<LabeledEdgeDefinition<TNode, TEdge>> edges)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(IEnumerable<LabeledEdge<TVertex, TEdgeLabel>> edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
             foreach (var edge in edges)
@@ -69,183 +69,183 @@ public static class DirectedGraph
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> AddEdges(params LabeledEdgeDefinition<TNode, TEdge>[] edges)
+        public GraphBuilder<TVertex, TEdgeLabel> AddEdges(params LabeledEdge<TVertex, TEdgeLabel>[] edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
-            return AddEdges((IEnumerable<LabeledEdgeDefinition<TNode, TEdge>>) edges);
+            return AddEdges((IEnumerable<LabeledEdge<TVertex, TEdgeLabel>>) edges);
         }
 
-        public GraphBuilder<TNode, TEdge> WithNodeComparer(IEqualityComparer<TNode> comparer)
+        public GraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(IEqualityComparer<TVertex> comparer)
         {
-            nodeComparer = comparer;
+            vertexComparer = comparer;
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> WithFormatter(IGraphFormatter<TNode, TEdge> formatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithFormatter(IGraphFormatter<TVertex, TEdgeLabel> formatter)
         {
             this.formatter = formatter;
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> WithFormatter(
-            IStringFormatter<TNode> nodeFormatter,
-            IStringFormatter<TEdge> edgeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithFormatter(
+            IStringFormatter<TVertex> vertexFormatter,
+            IStringFormatter<TEdgeLabel> edgeFormatter)
         {
-            return this.WithFormatter(GraphFormatter.Create(nodeFormatter, edgeFormatter));
+            return this.WithFormatter(GraphFormatter.Create(vertexFormatter, edgeFormatter));
         }
 
-        public GraphBuilder<TNode, TEdge> WithFormatter(
-            Func<TNode, string> nodeFormatter,
-            Func<TEdge, string> edgeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithFormatter(
+            Func<TVertex, string> vertexFormatter,
+            Func<TEdgeLabel, string> edgeFormatter)
         {
-            return this.WithFormatter(GraphFormatter.Create(nodeFormatter, edgeFormatter));
+            return this.WithFormatter(GraphFormatter.Create(vertexFormatter, edgeFormatter));
         }
 
-        public GraphBuilder<TNode, TEdge> WithNodeFormatter(
-            IStringFormatter<TNode> nodeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
+            IStringFormatter<TVertex> vertexFormatter)
         {
-            this.formatter ??= GraphFormatter<TNode, TEdge>.Default;
-            this.formatter = this.formatter.WithNodeFormatter(nodeFormatter);
+            this.formatter ??= GraphFormatter<TVertex, TEdgeLabel>.Default;
+            this.formatter = this.formatter.WithVertexFormatter(vertexFormatter);
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> WithNodeFormatter(
-            Func<TNode, string> nodeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
+            Func<TVertex, string> vertexFormatter)
         {
-            return this.WithNodeFormatter(StringFormatter.Create(nodeFormatter));
+            return this.WithVertexFormatter(StringFormatter.Create(vertexFormatter));
         }
 
-        public GraphBuilder<TNode, TEdge> WithEdgeFormatter(
-            IStringFormatter<TEdge> edgeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithEdgeFormatter(
+            IStringFormatter<TEdgeLabel> edgeFormatter)
         {
-            this.formatter ??= GraphFormatter<TNode, TEdge>.Default;
+            this.formatter ??= GraphFormatter<TVertex, TEdgeLabel>.Default;
             this.formatter = this.formatter.WithEdgeFormatter(edgeFormatter);
             return this;
         }
 
-        public GraphBuilder<TNode, TEdge> WithEdgeFormatter(
-            Func<TEdge, string> edgeFormatter)
+        public GraphBuilder<TVertex, TEdgeLabel> WithEdgeFormatter(
+            Func<TEdgeLabel, string> edgeFormatter)
         {
             return this.WithEdgeFormatter(StringFormatter.Create(edgeFormatter));
         }
 
-        public IDirectedGraph<TNode, TEdge> Build()
+        public IDirectedGraph<TVertex, TEdgeLabel> Build()
         {
-            var nodeComp = nodeComparer ?? EqualityComparer<TNode>.Default;
-            var fmt = formatter ?? GraphFormatter<TNode, TEdge>.Default;
+            var vertexComp = vertexComparer ?? EqualityComparer<TVertex>.Default;
+            var fmt = formatter ?? GraphFormatter<TVertex, TEdgeLabel>.Default;
 
-            var nodeList = new List<TNode>();
-            var edgeList = new List<LabeledEdgeDefinition<TNode, TEdge>>();
-            var nodeSet = new HashSet<TNode>(nodeComp);
+            var vertexList = new List<TVertex>();
+            var edgeList = new List<LabeledEdge<TVertex, TEdgeLabel>>();
+            var vertexSet = new HashSet<TVertex>(vertexComp);
 
             foreach (var item in data)
             {
                 item.Switch(
-                    node =>
+                    vertex =>
                     {
-                        if (nodeSet.Add(node))
+                        if (vertexSet.Add(vertex))
                         {
-                            nodeList.Add(node);
+                            vertexList.Add(vertex);
                         }
                     },
                     edge =>
                     {
-                        if (nodeSet.Add(edge.Source))
+                        if (vertexSet.Add(edge.Source))
                         {
-                            nodeList.Add(edge.Source);
+                            vertexList.Add(edge.Source);
                         }
 
-                        if (nodeSet.Add(edge.Target))
+                        if (vertexSet.Add(edge.Target))
                         {
-                            nodeList.Add(edge.Target);
+                            vertexList.Add(edge.Target);
                         }
 
                         edgeList.Add(edge);
                     });
             }
 
-            return new BuiltGraph<TNode, TEdge>(nodeList, edgeList, nodeComp, fmt);
+            return new BuiltGraph<TVertex, TEdgeLabel>(vertexList, edgeList, vertexComp, fmt);
         }
     }
 
-    private class BuiltGraph<TNode, TEdge> :
-        IDirectedGraph<TNode, TEdge>
-        where TNode : notnull
-        where TEdge : notnull
+    private class BuiltGraph<TVertex, TEdgeLabel> :
+        IDirectedGraph<TVertex, TEdgeLabel>
+        where TVertex : notnull
+        where TEdgeLabel : notnull
     {
         internal BuiltGraph(
-            IReadOnlyList<TNode> nodesCollection,
-            IReadOnlyList<LabeledEdgeDefinition<TNode, TEdge>> edgesCollection,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode, TEdge> formatter)
+            IReadOnlyList<TVertex> verticesCollection,
+            IReadOnlyList<LabeledEdge<TVertex, TEdgeLabel>> edgesCollection,
+            IEqualityComparer<TVertex> vertexComparer,
+            IGraphFormatter<TVertex, TEdgeLabel> formatter)
         {
-            this.Nodes = nodesCollection ?? throw new ArgumentNullException(nameof(nodesCollection));
+            this.Vertices = verticesCollection ?? throw new ArgumentNullException(nameof(verticesCollection));
             this.Edges = edgesCollection ?? throw new ArgumentNullException(nameof(edgesCollection));
-            this.NodeComparer = nodeComparer ?? throw new ArgumentNullException(nameof(nodeComparer));
+            this.VertexComparer = vertexComparer ?? throw new ArgumentNullException(nameof(vertexComparer));
             Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
         }
 
-        public IReadOnlyList<TNode> Nodes { get; }
+        public IReadOnlyList<TVertex> Vertices { get; }
 
-        public IReadOnlyList<LabeledEdgeDefinition<TNode, TEdge>> Edges { get; }
+        public IReadOnlyList<LabeledEdge<TVertex, TEdgeLabel>> Edges { get; }
 
-        public IEqualityComparer<TNode> NodeComparer { get; }
+        public IEqualityComparer<TVertex> VertexComparer { get; }
 
-        public IGraphFormatter<TNode, TEdge> Formatter { get; }
+        public IGraphFormatter<TVertex, TEdgeLabel> Formatter { get; }
     }
 
-    public static GraphBuilder<TNode> Builder<TNode>()
-        where TNode : notnull
+    public static GraphBuilder<TVertex> Builder<TVertex>()
+        where TVertex : notnull
     {
-        return new GraphBuilder<TNode>();
+        return new GraphBuilder<TVertex>();
     }
 
-    public class GraphBuilder<TNode>
-        where TNode : notnull
+    public class GraphBuilder<TVertex>
+        where TVertex : notnull
     {
-        private readonly List<NodeOrEdge<TNode>> data = new();
-        private IEqualityComparer<TNode>? nodeComparer;
-        private IGraphFormatter<TNode>? formatter;
+        private readonly List<VertexOrEdge<TVertex>> data = new();
+        private IEqualityComparer<TVertex>? vertexComparer;
+        private IGraphFormatter<TVertex>? formatter;
 
         internal GraphBuilder()
         {
         }
 
-        public GraphBuilder<TNode> AddNode(TNode node)
+        public GraphBuilder<TVertex> AddVertex(TVertex vertex)
         {
-            if (node == null) throw new ArgumentNullException(nameof(node));
-            data.Add(node);
+            if (vertex == null) throw new ArgumentNullException(nameof(vertex));
+            data.Add(vertex);
             return this;
         }
 
-        public GraphBuilder<TNode> AddNodes(IEnumerable<TNode> nodes)
+        public GraphBuilder<TVertex> AddVertices(IEnumerable<TVertex> vertices)
         {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            foreach (var node in nodes)
+            if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+            foreach (var vertex in vertices)
             {
-                this.AddNode(node);
+                this.AddVertex(vertex);
             }
             return this;
         }
 
-        public GraphBuilder<TNode> AddNodes(params TNode[] nodes)
+        public GraphBuilder<TVertex> AddVertices(params TVertex[] vertices)
         {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            return this.AddNodes((IEnumerable<TNode>)nodes);
+            if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+            return this.AddVertices((IEnumerable<TVertex>)vertices);
         }
 
-        public GraphBuilder<TNode> AddEdge(EdgeDefinition<TNode> edge)
+        public GraphBuilder<TVertex> AddEdge(Edge<TVertex> edge)
         {
             data.Add(edge);
             return this;
         }
 
-        public GraphBuilder<TNode> AddEdge(TNode source, TNode target)
+        public GraphBuilder<TVertex> AddEdge(TVertex source, TVertex target)
         {
-            return this.AddEdge(EdgeDefinition.Create(source, target));
+            return this.AddEdge(Edge.Create(source, target));
         }
 
-        public GraphBuilder<TNode> AddEdges(IEnumerable<EdgeDefinition<TNode>> edges)
+        public GraphBuilder<TVertex> AddEdges(IEnumerable<Edge<TVertex>> edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
             foreach (var edge in edges)
@@ -255,97 +255,97 @@ public static class DirectedGraph
             return this;
         }
 
-        public GraphBuilder<TNode> AddEdges(params EdgeDefinition<TNode>[] edges)
+        public GraphBuilder<TVertex> AddEdges(params Edge<TVertex>[] edges)
         {
             if (edges == null) throw new ArgumentNullException(nameof(edges));
-            return this.AddEdges((IEnumerable<EdgeDefinition<TNode>>)edges);
+            return this.AddEdges((IEnumerable<Edge<TVertex>>)edges);
         }
 
-        public GraphBuilder<TNode> WithNodeComparer(IEqualityComparer<TNode>? comparer)
+        public GraphBuilder<TVertex> WithVertexComparer(IEqualityComparer<TVertex>? comparer)
         {
-            nodeComparer = comparer;
+            vertexComparer = comparer;
             return this;
         }
 
-        public GraphBuilder<TNode> WithFormatter(IGraphFormatter<TNode>? formatter)
+        public GraphBuilder<TVertex> WithFormatter(IGraphFormatter<TVertex>? formatter)
         {
             this.formatter = formatter;
             return this;
         }
 
-        public GraphBuilder<TNode> WithFormatter(
-            IStringFormatter<TNode> nodeFormatter)
+        public GraphBuilder<TVertex> WithFormatter(
+            IStringFormatter<TVertex> vertexFormatter)
         {
-            return this.WithFormatter(GraphFormatter.Create(nodeFormatter));
+            return this.WithFormatter(GraphFormatter.Create(vertexFormatter));
         }
 
-        public GraphBuilder<TNode> WithFormatter(
-            Func<TNode, string> nodeFormatter)
+        public GraphBuilder<TVertex> WithFormatter(
+            Func<TVertex, string> vertexFormatter)
         {
-            return this.WithFormatter(GraphFormatter.Create(nodeFormatter));
+            return this.WithFormatter(GraphFormatter.Create(vertexFormatter));
         }
 
-        public IDirectedGraph<TNode> Build()
+        public IDirectedGraph<TVertex> Build()
         {
-            var nodeComp = nodeComparer ?? EqualityComparer<TNode>.Default;
-            var fmt = formatter ?? GraphFormatter<TNode>.Default;
+            var vertexComp = vertexComparer ?? EqualityComparer<TVertex>.Default;
+            var fmt = formatter ?? GraphFormatter<TVertex>.Default;
 
-            var nodeList = new List<TNode>();
-            var edgeList = new List<EdgeDefinition<TNode>>();
-            var nodeSet = new HashSet<TNode>(nodeComp);
+            var vertexList = new List<TVertex>();
+            var edgeList = new List<Edge<TVertex>>();
+            var vertexSet = new HashSet<TVertex>(vertexComp);
 
             foreach (var item in data)
             {
                 item.Switch(
-                    node =>
+                    vertex =>
                     {
-                        if (nodeSet.Add(node))
+                        if (vertexSet.Add(vertex))
                         {
-                            nodeList.Add(node);
+                            vertexList.Add(vertex);
                         }
                     },
                     edge =>
                     {
-                        if (nodeSet.Add(edge.Source))
+                        if (vertexSet.Add(edge.Source))
                         {
-                            nodeList.Add(edge.Source);
+                            vertexList.Add(edge.Source);
                         }
 
-                        if (nodeSet.Add(edge.Target))
+                        if (vertexSet.Add(edge.Target))
                         {
-                            nodeList.Add(edge.Target);
+                            vertexList.Add(edge.Target);
                         }
 
                         edgeList.Add(edge);
                     });
             }
 
-            return new BuiltGraph<TNode>(nodeList, edgeList, nodeComp, fmt);
+            return new BuiltGraph<TVertex>(vertexList, edgeList, vertexComp, fmt);
         }
     }
 
-    private class BuiltGraph<TNode> :
-        IDirectedGraph<TNode>
-        where TNode : notnull
+    private class BuiltGraph<TVertex> :
+        IDirectedGraph<TVertex>
+        where TVertex : notnull
     {
         internal BuiltGraph(
-            IReadOnlyList<TNode> nodesCollection,
-            IReadOnlyList<EdgeDefinition<TNode>> edgesCollection,
-            IEqualityComparer<TNode> nodeComparer,
-            IGraphFormatter<TNode> formatter)
+            IReadOnlyList<TVertex> verticesCollection,
+            IReadOnlyList<Edge<TVertex>> edgesCollection,
+            IEqualityComparer<TVertex> vertexComparer,
+            IGraphFormatter<TVertex> formatter)
         {
-            this.Nodes = nodesCollection ?? throw new ArgumentNullException(nameof(nodesCollection));
+            this.Vertices = verticesCollection ?? throw new ArgumentNullException(nameof(verticesCollection));
             this.Edges = edgesCollection ?? throw new ArgumentNullException(nameof(edgesCollection));
-            this.NodeComparer = nodeComparer ?? throw new ArgumentNullException(nameof(nodeComparer));
+            this.VertexComparer = vertexComparer ?? throw new ArgumentNullException(nameof(vertexComparer));
             Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
         }
 
-        public IReadOnlyList<TNode> Nodes { get; }
+        public IReadOnlyList<TVertex> Vertices { get; }
 
-        public IReadOnlyList<EdgeDefinition<TNode>> Edges { get; }
+        public IReadOnlyList<Edge<TVertex>> Edges { get; }
 
-        public IEqualityComparer<TNode> NodeComparer { get; }
+        public IEqualityComparer<TVertex> VertexComparer { get; }
         
-        public IGraphFormatter<TNode> Formatter { get; }
+        public IGraphFormatter<TVertex> Formatter { get; }
     }
 }
