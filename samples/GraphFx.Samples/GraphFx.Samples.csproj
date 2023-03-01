@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GraphFx.Testing\GraphFx.Testing.csproj" />
     <ProjectReference Include="..\..\src\GraphFx\GraphFx.csproj" />
   </ItemGroup>
 

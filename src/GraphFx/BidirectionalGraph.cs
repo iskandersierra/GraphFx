@@ -3,16 +3,37 @@
 public static class BidirectionalGraph
 {
     public static BidirectionalGraphBuilder<TVertex> Create<TVertex>(
+        IGraph<TVertex> fromDefinition)
+        where TVertex : notnull
+    {
+        return new BidirectionalGraphBuilder<TVertex>(fromDefinition);
+    }
+
+    public static BidirectionalGraphBuilder<TVertex> Create<TVertex>(
         IBidirectionalGraph<TVertex> fromDefinition)
         where TVertex : notnull
     {
         return new BidirectionalGraphBuilder<TVertex>(fromDefinition);
     }
 
-    public static BidirectionalGraphBuilder<TVertex> Create<TVertex>()
+    public static BidirectionalGraphBuilder<TVertex> Create<TVertex>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null)
         where TVertex : notnull
     {
-        return new BidirectionalGraphBuilder<TVertex>();
+        return new BidirectionalGraphBuilder<TVertex>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter);
+    }
+
+    public static BidirectionalGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IGraph<TVertex, TEdgeLabel> fromDefinition)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
+    {
+        return new BidirectionalGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
     public static BidirectionalGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
@@ -23,11 +44,19 @@ public static class BidirectionalGraph
         return new BidirectionalGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
-    public static BidirectionalGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>()
+    public static BidirectionalGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null,
+        IStringFormatter<TEdgeLabel>? edgeLabelFormatter = null)
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        return new BidirectionalGraphBuilder<TVertex, TEdgeLabel>();
+        return new BidirectionalGraphBuilder<TVertex, TEdgeLabel>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter,
+            edgeLabelFormatter);
     }
 
     public delegate IEnumerable<TVertex> OutgoingEdges<TVertex>(TVertex vertex) where TVertex : notnull;
@@ -102,11 +131,21 @@ public static class BidirectionalGraph
         private IncomingDegree<TVertex>? incomingDegree;
         private IncomingEdges<TVertex>? incomingEdges;
 
-        internal BidirectionalGraphBuilder()
+        internal BidirectionalGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+        }
+
+        internal BidirectionalGraphBuilder(IGraph<TVertex> fromDefinition)
+        {
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
         }
 
         internal BidirectionalGraphBuilder(IBidirectionalGraph<TVertex> fromDefinition)
@@ -122,51 +161,51 @@ public static class BidirectionalGraph
         }
 
         public BidirectionalGraphBuilder<TVertex> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> vertexEqualityComparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = vertexEqualityComparer ?? throw new ArgumentNullException(nameof(vertexEqualityComparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithVertexComparer(IComparer<TVertex> vertexComparer)
+        public BidirectionalGraphBuilder<TVertex> WithVertexComparer(IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = vertexComparer ?? throw new ArgumentNullException(nameof(vertexComparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithVertexFormatter(IStringFormatter<TVertex> vertexFormatter)
+        public BidirectionalGraphBuilder<TVertex> WithVertexFormatter(IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = vertexFormatter ?? throw new ArgumentNullException(nameof(vertexFormatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithSeedVertices(IEnumerable<TVertex> seedVertices)
+        public BidirectionalGraphBuilder<TVertex> WithSeedVertices(IEnumerable<TVertex> seed)
         {
-            this.seedVertices = seedVertices ?? throw new ArgumentNullException(nameof(seedVertices));
+            this.seedVertices = seed ?? throw new ArgumentNullException(nameof(seed));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithOutgoingDegree(OutgoingDegree<TVertex> outgoingDegree)
+        public BidirectionalGraphBuilder<TVertex> WithOutgoingDegree(OutgoingDegree<TVertex> degree)
         {
-            this.outgoingDegree = outgoingDegree ?? throw new ArgumentNullException(nameof(outgoingDegree));
+            this.outgoingDegree = degree ?? throw new ArgumentNullException(nameof(degree));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithOutgoingEdges(OutgoingEdges<TVertex> outgoingEdges)
+        public BidirectionalGraphBuilder<TVertex> WithOutgoingEdges(OutgoingEdges<TVertex> edges)
         {
-            this.outgoingEdges = outgoingEdges ?? throw new ArgumentNullException(nameof(outgoingEdges));
+            this.outgoingEdges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithIncomingDegree(IncomingDegree<TVertex> incomingDegree)
+        public BidirectionalGraphBuilder<TVertex> WithIncomingDegree(IncomingDegree<TVertex> degree)
         {
-            this.incomingDegree = incomingDegree ?? throw new ArgumentNullException(nameof(incomingDegree));
+            this.incomingDegree = degree ?? throw new ArgumentNullException(nameof(degree));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex> WithIncomingEdges(IncomingEdges<TVertex> incomingEdges)
+        public BidirectionalGraphBuilder<TVertex> WithIncomingEdges(IncomingEdges<TVertex> edges)
         {
-            this.incomingEdges = incomingEdges ?? throw new ArgumentNullException(nameof(incomingEdges));
+            this.incomingEdges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 
@@ -263,12 +302,24 @@ public static class BidirectionalGraph
         private IncomingDegree<TVertex>? incomingDegree;
         private IncomingLabeledEdges<TVertex, TEdgeLabel>? incomingLabeledEdges;
 
-        internal BidirectionalGraphBuilder()
+        internal BidirectionalGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter,
+            IStringFormatter<TEdgeLabel>? edgeLabelFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
-            edgeLabelFormatter = StringFormatter<TEdgeLabel>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+            this.edgeLabelFormatter = edgeLabelFormatter ?? StringFormatter<TEdgeLabel>.Default;
+        }
+
+        internal BidirectionalGraphBuilder(IGraph<TVertex, TEdgeLabel> fromDefinition)
+        {
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
+            edgeLabelFormatter = fromDefinition.EdgeLabelFormatter;
         }
 
         internal BidirectionalGraphBuilder(IBidirectionalGraph<TVertex, TEdgeLabel> fromDefinition)
@@ -285,57 +336,57 @@ public static class BidirectionalGraph
         }
 
         public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> vertexEqualityComparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = vertexEqualityComparer ?? throw new ArgumentNullException(nameof(vertexEqualityComparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(IComparer<TVertex> vertexComparer)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = vertexComparer ?? throw new ArgumentNullException(nameof(vertexComparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(IStringFormatter<TVertex> vertexFormatter)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = vertexFormatter ?? throw new ArgumentNullException(nameof(vertexFormatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(IStringFormatter<TEdgeLabel> edgeLabelFormatter)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(IStringFormatter<TEdgeLabel>? formatter)
         {
-            this.edgeLabelFormatter = edgeLabelFormatter ?? throw new ArgumentNullException(nameof(edgeLabelFormatter));
+            this.edgeLabelFormatter = formatter ?? StringFormatter<TEdgeLabel>.Default;
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithSeedVertices(IEnumerable<TVertex> seedVertices)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithSeedVertices(IEnumerable<TVertex> seed)
         {
-            this.seedVertices = seedVertices ?? throw new ArgumentNullException(nameof(seedVertices));
+            this.seedVertices = seed ?? throw new ArgumentNullException(nameof(seed));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithOutgoingDegree(OutgoingDegree<TVertex> outgoingDegree)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithOutgoingDegree(OutgoingDegree<TVertex> degree)
         {
-            this.outgoingDegree = outgoingDegree ?? throw new ArgumentNullException(nameof(outgoingDegree));
+            this.outgoingDegree = degree ?? throw new ArgumentNullException(nameof(degree));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithOutgoingLabeledEdges(OutgoingLabeledEdges<TVertex, TEdgeLabel> outgoingLabeledEdges)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithOutgoingLabeledEdges(OutgoingLabeledEdges<TVertex, TEdgeLabel> edges)
         {
-            this.outgoingLabeledEdges = outgoingLabeledEdges ?? throw new ArgumentNullException(nameof(outgoingLabeledEdges));
+            this.outgoingLabeledEdges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithIncomingDegree(IncomingDegree<TVertex> incomingDegree)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithIncomingDegree(IncomingDegree<TVertex> degree)
         {
-            this.incomingDegree = incomingDegree ?? throw new ArgumentNullException(nameof(incomingDegree));
+            this.incomingDegree = degree ?? throw new ArgumentNullException(nameof(degree));
             return this;
         }
 
-        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithIncomingLabeledEdges(IncomingLabeledEdges<TVertex, TEdgeLabel> incomingLabeledEdges)
+        public BidirectionalGraphBuilder<TVertex, TEdgeLabel> WithIncomingLabeledEdges(IncomingLabeledEdges<TVertex, TEdgeLabel> edges)
         {
-            this.incomingLabeledEdges = incomingLabeledEdges ?? throw new ArgumentNullException(nameof(incomingLabeledEdges));
+            this.incomingLabeledEdges = edges ?? throw new ArgumentNullException(nameof(edges));
             return this;
         }
 

@@ -5,16 +5,37 @@ namespace GraphFx;
 public static class ImplicitGraph
 {
     public static ImplicitGraphBuilder<TVertex> Create<TVertex>(
+        IGraph<TVertex> fromDefinition)
+        where TVertex : notnull
+    {
+        return new ImplicitGraphBuilder<TVertex>(fromDefinition);
+    }
+
+    public static ImplicitGraphBuilder<TVertex> Create<TVertex>(
         IImplicitGraph<TVertex> fromDefinition)
         where TVertex : notnull
     {
         return new ImplicitGraphBuilder<TVertex>(fromDefinition);
     }
 
-    public static ImplicitGraphBuilder<TVertex> Create<TVertex>()
+    public static ImplicitGraphBuilder<TVertex> Create<TVertex>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null)
         where TVertex : notnull
     {
-        return new ImplicitGraphBuilder<TVertex>();
+        return new ImplicitGraphBuilder<TVertex>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter);
+    }
+
+    public static ImplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IGraph<TVertex, TEdgeLabel> fromDefinition)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
+    {
+        return new ImplicitGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
     public static ImplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
@@ -25,11 +46,19 @@ public static class ImplicitGraph
         return new ImplicitGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
-    public static ImplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>()
+    public static ImplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null,
+        IStringFormatter<TEdgeLabel>? edgeLabelFormatter = null)
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        return new ImplicitGraphBuilder<TVertex, TEdgeLabel>();
+        return new ImplicitGraphBuilder<TVertex, TEdgeLabel>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter,
+            edgeLabelFormatter);
     }
 
     public delegate bool ContainsVertex<in TVertex>(TVertex vertex) where TVertex : notnull;
@@ -83,11 +112,24 @@ public static class ImplicitGraph
         private ContainsVertex<TVertex>? containsVertex;
         private ContainsEdge<TVertex>? containsEdge;
 
-        internal ImplicitGraphBuilder()
+        internal ImplicitGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+        }
+
+        internal ImplicitGraphBuilder(
+            IGraph<TVertex> fromDefinition)
+        {
+            if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
+
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
         }
 
         internal ImplicitGraphBuilder(
@@ -103,23 +145,23 @@ public static class ImplicitGraph
         }
 
         public ImplicitGraphBuilder<TVertex> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> comparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
         public ImplicitGraphBuilder<TVertex> WithVertexComparer(
-            IComparer<TVertex> comparer)
+            IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
         public ImplicitGraphBuilder<TVertex> WithVertexFormatter(
-            IStringFormatter<TVertex> formatter)
+            IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
@@ -202,12 +244,26 @@ public static class ImplicitGraph
         private ContainsVertex<TVertex>? containsVertex;
         private TryGetEdgeLabel<TVertex, TEdgeLabel>? tryGetEdgeLabel;
 
-        internal ImplicitGraphBuilder()
+        internal ImplicitGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter,
+            IStringFormatter<TEdgeLabel>? edgeLabelFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
-            edgeLabelFormatter = StringFormatter<TEdgeLabel>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+            this.edgeLabelFormatter = edgeLabelFormatter ?? StringFormatter<TEdgeLabel>.Default;
+        }
+
+        internal ImplicitGraphBuilder(IGraph<TVertex, TEdgeLabel> fromDefinition)
+        {
+            if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
+
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
+            edgeLabelFormatter = fromDefinition.EdgeLabelFormatter;
         }
 
         internal ImplicitGraphBuilder(IImplicitGraph<TVertex, TEdgeLabel> fromDefinition)
@@ -223,30 +279,30 @@ public static class ImplicitGraph
         }
 
         public ImplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> comparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
         public ImplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(
-            IComparer<TVertex> comparer)
+            IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
         public ImplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
-            IStringFormatter<TVertex> formatter)
+            IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
         public ImplicitGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(
-            IStringFormatter<TEdgeLabel> formatter)
+            IStringFormatter<TEdgeLabel>? formatter)
         {
-            this.edgeLabelFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.edgeLabelFormatter = formatter ?? StringFormatter<TEdgeLabel>.Default;
             return this;
         }
 

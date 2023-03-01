@@ -3,16 +3,37 @@
 public static class ExplicitGraph
 {
     public static ExplicitGraphBuilder<TVertex> Create<TVertex>(
+        IGraph<TVertex> fromDefinition)
+        where TVertex : notnull
+    {
+        return new ExplicitGraphBuilder<TVertex>(fromDefinition);
+    }
+
+    public static ExplicitGraphBuilder<TVertex> Create<TVertex>(
         IExplicitGraph<TVertex> fromDefinition)
         where TVertex : notnull
     {
         return new ExplicitGraphBuilder<TVertex>(fromDefinition);
     }
 
-    public static ExplicitGraphBuilder<TVertex> Create<TVertex>()
+    public static ExplicitGraphBuilder<TVertex> Create<TVertex>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null)
         where TVertex : notnull
     {
-        return new ExplicitGraphBuilder<TVertex>();
+        return new ExplicitGraphBuilder<TVertex>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter);
+    }
+
+    public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IGraph<TVertex, TEdgeLabel> fromDefinition)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
+    {
+        return new ExplicitGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
     public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
@@ -23,11 +44,19 @@ public static class ExplicitGraph
         return new ExplicitGraphBuilder<TVertex, TEdgeLabel>(fromDefinition);
     }
 
-    public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>()
+    public static ExplicitGraphBuilder<TVertex, TEdgeLabel> Create<TVertex, TEdgeLabel>(
+        IEqualityComparer<TVertex>? vertexEqualityComparer = null,
+        IComparer<TVertex>? vertexComparer = null,
+        IStringFormatter<TVertex>? vertexFormatter = null,
+        IStringFormatter<TEdgeLabel>? edgeLabelFormatter = null)
         where TVertex : notnull
         where TEdgeLabel : notnull
     {
-        return new ExplicitGraphBuilder<TVertex, TEdgeLabel>();
+        return new ExplicitGraphBuilder<TVertex, TEdgeLabel>(
+            vertexEqualityComparer,
+            vertexComparer,
+            vertexFormatter,
+            edgeLabelFormatter);
     }
 
     private class BuiltExplicitGraph<TVertex> :
@@ -68,11 +97,23 @@ public static class ExplicitGraph
         private IEnumerable<TVertex>? vertices;
         private IEnumerable<Edge<TVertex>>? edges;
 
-        internal ExplicitGraphBuilder()
+        internal ExplicitGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+        }
+
+        internal ExplicitGraphBuilder(IGraph<TVertex> fromDefinition)
+        {
+            if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
+
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
         }
 
         internal ExplicitGraphBuilder(IExplicitGraph<TVertex> fromDefinition)
@@ -87,23 +128,23 @@ public static class ExplicitGraph
         }
 
         public ExplicitGraphBuilder<TVertex> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> comparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
         public ExplicitGraphBuilder<TVertex> WithVertexComparer(
-            IComparer<TVertex> comparer)
+            IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
         public ExplicitGraphBuilder<TVertex> WithVertexFormatter(
-            IStringFormatter<TVertex> formatter)
+            IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
@@ -180,12 +221,26 @@ public static class ExplicitGraph
         private IEnumerable<TVertex>? vertices;
         private IEnumerable<Edge<TVertex, TEdgeLabel>>? labeledEdges;
 
-        internal ExplicitGraphBuilder()
+        internal ExplicitGraphBuilder(
+            IEqualityComparer<TVertex>? vertexEqualityComparer,
+            IComparer<TVertex>? vertexComparer,
+            IStringFormatter<TVertex>? vertexFormatter,
+            IStringFormatter<TEdgeLabel>? edgeLabelFormatter)
         {
-            vertexEqualityComparer = EqualityComparer<TVertex>.Default;
-            vertexComparer = Comparer<TVertex>.Default;
-            vertexFormatter = StringFormatter<TVertex>.Default;
-            edgeLabelFormatter = StringFormatter<TEdgeLabel>.Default;
+            this.vertexEqualityComparer = vertexEqualityComparer ?? EqualityComparer<TVertex>.Default;
+            this.vertexComparer = vertexComparer ?? Comparer<TVertex>.Default;
+            this.vertexFormatter = vertexFormatter ?? StringFormatter<TVertex>.Default;
+            this.edgeLabelFormatter = edgeLabelFormatter ?? StringFormatter<TEdgeLabel>.Default;
+        }
+
+        internal ExplicitGraphBuilder(IGraph<TVertex, TEdgeLabel> fromDefinition)
+        {
+            if (fromDefinition == null) throw new ArgumentNullException(nameof(fromDefinition));
+
+            vertexEqualityComparer = fromDefinition.VertexEqualityComparer;
+            vertexComparer = fromDefinition.VertexComparer;
+            vertexFormatter = fromDefinition.VertexFormatter;
+            edgeLabelFormatter = fromDefinition.EdgeLabelFormatter;
         }
 
         internal ExplicitGraphBuilder(IExplicitGraph<TVertex, TEdgeLabel> fromDefinition)
@@ -201,30 +256,30 @@ public static class ExplicitGraph
         }
 
         public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexEqualityComparer(
-            IEqualityComparer<TVertex> comparer)
+            IEqualityComparer<TVertex>? comparer)
         {
-            this.vertexEqualityComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexEqualityComparer = comparer ?? EqualityComparer<TVertex>.Default;
             return this;
         }
 
         public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexComparer(
-            IComparer<TVertex> comparer)
+            IComparer<TVertex>? comparer)
         {
-            this.vertexComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            this.vertexComparer = comparer ?? Comparer<TVertex>.Default;
             return this;
         }
 
         public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithVertexFormatter(
-            IStringFormatter<TVertex> formatter)
+            IStringFormatter<TVertex>? formatter)
         {
-            this.vertexFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.vertexFormatter = formatter ?? StringFormatter<TVertex>.Default;
             return this;
         }
 
         public ExplicitGraphBuilder<TVertex, TEdgeLabel> WithEdgeLabelFormatter(
-            IStringFormatter<TEdgeLabel> formatter)
+            IStringFormatter<TEdgeLabel>? formatter)
         {
-            this.edgeLabelFormatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            this.edgeLabelFormatter = formatter ?? StringFormatter<TEdgeLabel>.Default;
             return this;
         }
 
@@ -254,6 +309,21 @@ public static class ExplicitGraph
                 vertices,
                 labeledEdges);
         }
+    }
+
+    public static IIncidenceGraph<TVertex, TEdgeLabel> ToIncidenceGraph<TVertex, TEdgeLabel>(
+        this IExplicitGraph<TVertex, TEdgeLabel> graph)
+        where TVertex : notnull
+        where TEdgeLabel : notnull
+    {
+        return graph.Vertices
+            .ToDictionary(
+                v => v,
+                v => graph.LabeledEdges
+                    .Where(e => graph.VertexEqualityComparer.Equals(e.Source, v))
+                    .Select(e => new OutgoingEdge<TVertex, TEdgeLabel>(e.Label, e.Target))
+                    .ToArray() as IReadOnlyCollection<OutgoingEdge<TVertex, TEdgeLabel>>)
+            .ToIncidenceGraph(graph);
     }
 }
 
@@ -298,6 +368,11 @@ public class ExplicitGraph<TVertex> :
         vertices.Add(edge.Source);
         vertices.Add(edge.Target);
         edges.Add(edge);
+    }
+
+    public void Add(TVertex source, TVertex target)
+    {
+        Add(new Edge<TVertex>(source, target));
     }
 
     public void AddRange(IEnumerable<TVertex> vertices)
@@ -383,6 +458,11 @@ public class ExplicitGraph<TVertex, TEdgeLabel> :
         vertices.Add(edge.Source);
         vertices.Add(edge.Target);
         edges.Add(edge);
+    }
+
+    public void Add(TVertex source, TEdgeLabel label, TVertex target)
+    {
+        Add(new Edge<TVertex, TEdgeLabel>(source, label, target));
     }
 
     public void AddRange(IEnumerable<TVertex> vertices)
